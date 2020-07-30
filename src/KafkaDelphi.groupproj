@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{7C9FF258-8E20-471D-929F-A690FD60710E}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="..\demo\KafkaDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\packages\KafkaDelphi.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="KafkaDemo">
+        <MSBuild Projects="..\demo\KafkaDemo.dproj"/>
+    </Target>
+    <Target Name="KafkaDemo:Clean">
+        <MSBuild Projects="..\demo\KafkaDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="KafkaDemo:Make">
+        <MSBuild Projects="..\demo\KafkaDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="KafkaDelphi">
+        <MSBuild Projects="..\packages\KafkaDelphi.dproj"/>
+    </Target>
+    <Target Name="KafkaDelphi:Clean">
+        <MSBuild Projects="..\packages\KafkaDelphi.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="KafkaDelphi:Make">
+        <MSBuild Projects="..\packages\KafkaDelphi.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="KafkaDemo;KafkaDelphi"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="KafkaDemo:Clean;KafkaDelphi:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="KafkaDemo:Make;KafkaDelphi:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

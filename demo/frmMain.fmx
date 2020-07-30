@@ -1,0 +1,98 @@
+object frmKafkaDemo: TfrmKafkaDemo
+  Left = 0
+  Top = 0
+  Caption = 'Form7'
+  ClientHeight = 745
+  ClientWidth = 1298
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Layout1: TLayout
+    Align = MostLeft
+    Margins.Left = 3.000000000000000000
+    Margins.Top = 3.000000000000000000
+    Margins.Right = 3.000000000000000000
+    Margins.Bottom = 3.000000000000000000
+    Position.X = 3.000000000000000000
+    Position.Y = 3.000000000000000000
+    Size.Width = 337.000000000000000000
+    Size.Height = 739.000000000000000000
+    Size.PlatformDefault = False
+    object Button1: TButton
+      Action = actProduceMessage
+      Align = Top
+      Enabled = True
+      ImageIndex = -1
+      Margins.Bottom = 3.000000000000000000
+      Size.Width = 337.000000000000000000
+      Size.Height = 25.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object Layout2: TLayout
+      Align = Top
+      Position.Y = 28.000000000000000000
+      Size.Width = 337.000000000000000000
+      Size.Height = 25.000000000000000000
+      Size.PlatformDefault = False
+      object Button2: TButton
+        Action = actStartConsuming
+        Align = MostLeft
+        Enabled = True
+        ImageIndex = -1
+        Size.Width = 169.000000000000000000
+        Size.Height = 25.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object Button3: TButton
+        Action = actStopConsuming
+        Align = Client
+        Enabled = True
+        ImageIndex = -1
+        Margins.Left = 3.000000000000000000
+        Size.Width = 165.000000000000000000
+        Size.Height = 25.000000000000000000
+        Size.PlatformDefault = False
+      end
+    end
+  end
+  object memLog: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    ReadOnly = True
+    StyledSettings = [Style, FontColor]
+    TextSettings.Font.Family = 'Consolas'
+    TextSettings.Font.Size = 14.000000000000000000
+    Align = Client
+    Margins.Top = 3.000000000000000000
+    Margins.Right = 3.000000000000000000
+    Margins.Bottom = 3.000000000000000000
+    Size.Width = 952.000000000000000000
+    Size.Height = 739.000000000000000000
+    Size.PlatformDefault = False
+    Viewport.Width = 948.000000000000000000
+    Viewport.Height = 735.000000000000000000
+  end
+  object tmrLog: TTimer
+    Interval = 20
+    OnTimer = tmrLogTimer
+    Left = 75
+    Top = 73
+  end
+  object ActionList1: TActionList
+    Left = 24
+    Top = 72
+    object actProduceMessage: TAction
+      Text = 'Produce Message'
+      OnExecute = actProduceMessageExecute
+    end
+    object actStartConsuming: TAction
+      Text = 'Stat Consuming'
+      OnExecute = actStartConsumingExecute
+    end
+    object actStopConsuming: TAction
+      Text = 'Stop Consuming'
+      OnExecute = actStopConsumingExecute
+    end
+  end
+end
