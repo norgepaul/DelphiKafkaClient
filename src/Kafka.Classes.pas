@@ -490,7 +490,7 @@ procedure TKafkaConsumer.DoCleanUp;
 begin
   if FKafkaHandle <> nil then
   begin
-    //rd_kafka_consumer_close(FKafkaHandle);
+    rd_kafka_consumer_close(FKafkaHandle);
     rd_kafka_destroy(FKafkaHandle);
   end;
 end;
@@ -504,19 +504,19 @@ begin
       begin
         try
           DoSetup;
-
-          while not TThread.CurrentThread.CheckTerminated do
-          begin
-            DoExecute;
+          try
+            while not TThread.CurrentThread.CheckTerminated do
+            begin
+              DoExecute;
+            end;
+          finally
+            { TODO : Why do we get an AV here? }
+            DoCleanUp;
           end;
-
-          DoCleanUp;
         except
           on e: Exception do
           begin
             TKafka.Log(StrCriticalError + e.Message, TKafkaLogType.kltConsumer);
-
-            DoCleanUp;
           end;
         end;
       end);

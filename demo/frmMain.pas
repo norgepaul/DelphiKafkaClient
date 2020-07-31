@@ -8,11 +8,11 @@ uses
 
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
   FMX.Controls.Presentation, FMX.StdCtrls, FMX.ActnList, FMX.Memo.Types, FMX.ScrollBox,
-  FMX.Memo, FMX.Layouts,
+  FMX.Edit, FMX.EditBox, FMX.SpinBox, FMX.Memo, FMX.Layouts,
 
   Kafka.Lib,
   Kafka.Classes,
-  Kafka.Types, FMX.Edit, FMX.EditBox, FMX.SpinBox;
+  Kafka.Types;
 
 type
   EKafkaError = class(Exception);
@@ -84,7 +84,6 @@ var
   Configuration: prd_kafka_conf_t;
   TopicConfiguration: prd_kafka_topic_conf_t;
   TopicName: PAnsiChar;
-  Subscribing: Boolean;
   Brokers: PAnsiChar;
 begin
   if FKafkaConsumer = nil then
@@ -160,7 +159,7 @@ begin
 
       for i := 0 to pred(Trunc(edtMessageCount.Value)) do
       begin
-        Msgs[i] := DefaultMessage + ' - ' + DateTimeToStr(now) + '.' + MilliSecondOf(now).ToString.PadLeft(3, '0');
+        Msgs[i] := AnsiString(DefaultMessage + ' - ' + DateTimeToStr(now) + '.' + MilliSecondOf(now).ToString.PadLeft(3, '0'));
       end;
 
       TKafka.Produce(
