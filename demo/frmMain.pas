@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes,
-  System.Variants, System.Actions,
+  System.Variants, System.Actions, System.DateUtils, System.SyncObjs,
 
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
   FMX.Controls.Presentation, FMX.StdCtrls, FMX.ActnList, FMX.Memo.Types, FMX.ScrollBox,
@@ -12,7 +12,7 @@ uses
 
   Kafka.Lib,
   Kafka.Classes,
-  Kafka.Types;
+  Kafka.Types, FMX.Edit, FMX.EditBox, FMX.SpinBox;
 
 type
   EKafkaError = class(Exception);
@@ -22,17 +22,23 @@ type
     actProduceMessage: TAction;
     actStartConsuming: TAction;
     Layout1: TLayout;
-    Button1: TButton;
-    memLog: TMemo;
     tmrLog: TTimer;
     Layout2: TLayout;
     Button2: TButton;
     actStopConsuming: TAction;
     Button3: TButton;
+    Layout3: TLayout;
+    edtMessageCount: TSpinBox;
+    Button1: TButton;
+    GridPanelLayout1: TGridPanelLayout;
+    memLogProducer: TMemo;
+    memLogConsumer: TMemo;
+    memLogOther: TMemo;
     procedure actProduceMessageExecute(Sender: TObject);
     procedure actStartConsumingExecute(Sender: TObject);
     procedure tmrLogTimer(Sender: TObject);
     procedure actStopConsumingExecute(Sender: TObject);
+    procedure ActionList1Update(Action: TBasicAction; var Handled: Boolean);
   private
     FKafkaConsumer: TKafkaConsumer;
 
@@ -58,20 +64,18 @@ const
 procedure TfrmKafkaDemo.OnLog(const Values: TStrings);
 var
   i: Integer;
+  Memo: TMemo;
 begin
-  memLog.BeginUpdate;
-  try
-    for i := 0 to pred(Values.Count) do
-    begin
-      memLog.Lines.Add(Values[i]);
+  for i := 0 to pred(Values.Count) do
+  begin
+    case TKafkaLogType(Values.Objects[i]) of
+      kltProducer: Memo := memLogProducer;
+      kltConsumer: Memo := memLogConsumer;
+    else
+      Memo := memLogOther;
     end;
 
-    if not memLog.IsFocused then
-    begin
-      memLog.ScrollBy(0, MaxInt, False);
-    end;
-  finally
-    memLog.EndUpdate;
+    Memo.Lines.Add(Values[i]);
   end;
 end;
 
@@ -107,7 +111,7 @@ begin
       [0],
       procedure(const Msg: prd_kafka_message_t)
       begin
-        TKafka.Log(format('Message received - %s', [TKafkaHelper.PointerToStr(Msg.payload, Msg.len)]));
+        TKafka.Log(format('Message received - %s', [TKafkaHelper.PointerToStr(Msg.payload, Msg.len)]), TKafkaLogType.kltConsumer);
       end);
 
     FKafkaConsumer.Start;
@@ -119,7 +123,17 @@ begin
   if FKafkaConsumer <> nil then
   begin
     FKafkaConsumer.Free;
+
+    FKafkaConsumer := nil;
   end;
+end;
+
+procedure TfrmKafkaDemo.ActionList1Update(Action: TBasicAction; var Handled: Boolean);
+begin
+  actStartConsuming.Enabled := FKafkaConsumer = nil;
+  actStopConsuming.Enabled := FKafkaConsumer <> nil;
+
+  Handled := True;
 end;
 
 procedure TfrmKafkaDemo.actProduceMessageExecute(Sender: TObject);
@@ -127,6 +141,8 @@ var
   Configuration: prd_kafka_conf_t;
   KafkaHandle: prd_kafka_t;
   Topic: prd_kafka_topic_t;
+  Msgs: TArray<AnsiString>;
+  i: Integer;
 begin
   Configuration := TKafka.NewConfiguration(
     ['bootstrap.servers'],
@@ -138,12 +154,20 @@ begin
       KafkaHandle,
       DefaultTopic,
       nil);
+
     try
+      SetLength(Msgs, Trunc(edtMessageCount.Value));
+
+      for i := 0 to pred(Trunc(edtMessageCount.Value)) do
+      begin
+        Msgs[i] := DefaultMessage + ' - ' + DateTimeToStr(now) + '.' + MilliSecondOf(now).ToString.PadLeft(3, '0');
+      end;
+
       TKafka.Produce(
         Topic,
         RD_KAFKA_PARTITION_UA,
         RD_KAFKA_MSG_F_COPY,
-        DefaultMessage,
+        Msgs,
         nil,
         0,
         nil);

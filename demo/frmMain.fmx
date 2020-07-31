@@ -3,7 +3,7 @@ object frmKafkaDemo: TfrmKafkaDemo
   Top = 0
   Caption = 'Form7'
   ClientHeight = 745
-  ClientWidth = 1298
+  ClientWidth = 1470
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
@@ -19,16 +19,6 @@ object frmKafkaDemo: TfrmKafkaDemo
     Size.Width = 337.000000000000000000
     Size.Height = 739.000000000000000000
     Size.PlatformDefault = False
-    object Button1: TButton
-      Action = actProduceMessage
-      Align = Top
-      Enabled = True
-      ImageIndex = -1
-      Margins.Bottom = 3.000000000000000000
-      Size.Width = 337.000000000000000000
-      Size.Height = 25.000000000000000000
-      Size.PlatformDefault = False
-    end
     object Layout2: TLayout
       Align = Top
       Position.Y = 28.000000000000000000
@@ -47,7 +37,7 @@ object frmKafkaDemo: TfrmKafkaDemo
       object Button3: TButton
         Action = actStopConsuming
         Align = Client
-        Enabled = True
+        Enabled = False
         ImageIndex = -1
         Margins.Left = 3.000000000000000000
         Size.Width = 165.000000000000000000
@@ -55,43 +45,144 @@ object frmKafkaDemo: TfrmKafkaDemo
         Size.PlatformDefault = False
       end
     end
-  end
-  object memLog: TMemo
-    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
-    DataDetectorTypes = []
-    ReadOnly = True
-    StyledSettings = [Style, FontColor]
-    TextSettings.Font.Family = 'Consolas'
-    TextSettings.Font.Size = 14.000000000000000000
-    Align = Client
-    Margins.Top = 3.000000000000000000
-    Margins.Right = 3.000000000000000000
-    Margins.Bottom = 3.000000000000000000
-    Size.Width = 952.000000000000000000
-    Size.Height = 739.000000000000000000
-    Size.PlatformDefault = False
-    Viewport.Width = 948.000000000000000000
-    Viewport.Height = 735.000000000000000000
+    object Layout3: TLayout
+      Align = MostTop
+      Margins.Bottom = 3.000000000000000000
+      Size.Width = 337.000000000000000000
+      Size.Height = 25.000000000000000000
+      Size.PlatformDefault = False
+      object edtMessageCount: TSpinBox
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = MostRight
+        Cursor = crIBeam
+        Min = 1.000000000000000000
+        Max = 10000000.000000000000000000
+        Value = 1.000000000000000000
+        Position.X = 240.000000000000000000
+        Margins.Left = 2.000000000000000000
+        Size.Width = 97.000000000000000000
+        Size.Height = 25.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object Button1: TButton
+        Action = actProduceMessage
+        Align = Client
+        Enabled = True
+        ImageIndex = -1
+        Size.Width = 238.000000000000000000
+        Size.Height = 25.000000000000000000
+        Size.PlatformDefault = False
+      end
+    end
   end
   object tmrLog: TTimer
     Interval = 20
     OnTimer = tmrLogTimer
-    Left = 75
-    Top = 73
+    Left = 79
+    Top = 72
+  end
+  object GridPanelLayout1: TGridPanelLayout
+    Align = Client
+    Size.Width = 1127.000000000000000000
+    Size.Height = 745.000000000000000000
+    Size.PlatformDefault = False
+    ColumnCollection = <
+      item
+        Value = 33.500849888580990000
+      end
+      item
+        Value = 33.333032027156600000
+      end
+      item
+        Value = 33.166118084262400000
+      end>
+    ControlCollection = <
+      item
+        Column = 0
+        Control = memLogProducer
+        Row = 0
+      end
+      item
+        Column = 1
+        Control = memLogConsumer
+        Row = 0
+      end
+      item
+        Column = 2
+        Control = memLogOther
+        Row = 0
+      end>
+    RowCollection = <
+      item
+        Value = 100.000000000000000000
+      end>
+    object memLogProducer: TMemo
+      Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+      DataDetectorTypes = []
+      ReadOnly = True
+      StyledSettings = [Style, FontColor]
+      TextSettings.Font.Family = 'Consolas'
+      TextSettings.Font.Size = 14.000000000000000000
+      Align = Client
+      Margins.Top = 3.000000000000000000
+      Margins.Right = 3.000000000000000000
+      Margins.Bottom = 3.000000000000000000
+      Size.Width = 374.554565429687500000
+      Size.Height = 739.000000000000000000
+      Size.PlatformDefault = False
+      Viewport.Width = 370.600000000000000000
+      Viewport.Height = 735.000000000000000000
+    end
+    object memLogConsumer: TMemo
+      Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+      DataDetectorTypes = []
+      ReadOnly = True
+      StyledSettings = [Style, FontColor]
+      TextSettings.Font.Family = 'Consolas'
+      TextSettings.Font.Size = 14.000000000000000000
+      Align = Client
+      Margins.Top = 3.000000000000000000
+      Margins.Right = 3.000000000000000000
+      Margins.Bottom = 3.000000000000000000
+      Size.Width = 372.663269042968800000
+      Size.Height = 739.000000000000000000
+      Size.PlatformDefault = False
+      Viewport.Width = 368.700000000000000000
+      Viewport.Height = 735.000000000000000000
+    end
+    object memLogOther: TMemo
+      Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+      DataDetectorTypes = []
+      ReadOnly = True
+      StyledSettings = [Style, FontColor]
+      TextSettings.Font.Family = 'Consolas'
+      TextSettings.Font.Size = 14.000000000000000000
+      Align = Client
+      Margins.Top = 3.000000000000000000
+      Margins.Right = 3.000000000000000000
+      Margins.Bottom = 3.000000000000000000
+      Size.Width = 370.782165527343800000
+      Size.Height = 739.000000000000000000
+      Size.PlatformDefault = False
+      Viewport.Width = 366.800000000000000000
+      Viewport.Height = 735.000000000000000000
+    end
   end
   object ActionList1: TActionList
+    OnUpdate = ActionList1Update
     Left = 24
     Top = 72
     object actProduceMessage: TAction
-      Text = 'Produce Message'
+      Text = 'Produce Messages'
       OnExecute = actProduceMessageExecute
     end
     object actStartConsuming: TAction
-      Text = 'Stat Consuming'
+      Text = 'Start Consuming'
       OnExecute = actStartConsumingExecute
     end
     object actStopConsuming: TAction
       Text = 'Stop Consuming'
+      Enabled = False
       OnExecute = actStopConsumingExecute
     end
   end

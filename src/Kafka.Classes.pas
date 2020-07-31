@@ -16,7 +16,16 @@ type
 
   TConsumerMessageHandlerProc = reference to procedure(const Msg: prd_kafka_message_t);
 
-  TKafkaConsumer = class
+  TKafkaConnectionBase = class
+  protected
+    FKafkaHandle: prd_kafka_t;
+
+    procedure DoSetup; virtual; abstract;
+    procedure DoExecute; virtual; abstract;
+    procedure DoCleanUp; virtual; abstract;
+  end;
+
+  TKafkaConsumer = class(TKafkaConnectionBase)
   private
     procedure OnThreadTerminate(Sender: TObject);
   protected
@@ -26,11 +35,10 @@ type
     FBrokers: PAnsiChar;
     FTopics: TArray<PAnsiChar>;
     FPartitions: TArray<Integer>;
-    FKafkaHandle: prd_kafka_t;
 
-    procedure DoSetup; virtual;
-    procedure DoExecute; virtual;
-    procedure DoCleanUp; virtual;
+    procedure DoSetup; override;
+    procedure DoExecute; override;
+    procedure DoCleanUp; override;
   public
     constructor Create(const Configuration: prd_kafka_conf_t; const Handler: TConsumerMessageHandlerProc; const Brokers: PAnsiChar; const Topics: TArray<PAnsiChar>; const Partitions: TArray<Integer>);
     destructor Destroy; override;
@@ -45,12 +53,12 @@ type
     class var FOnLog: TOnLog;
     class procedure CheckKeyValues(const Keys, Values: TArray<PAnsiChar>); static;
   protected
-    class procedure DoLog(const Text: String);
+    class procedure DoLog(const Text: String; const LogType: TKafkaLogType);
   public
     class constructor Create;
     class destructor Destroy;
 
-    class procedure Log(const Text: String);
+    class procedure Log(const Text: String; const LogType: TKafkaLogType);
 
     class function NewConfiguration(const DefaultCallBacks: Boolean = True): prd_kafka_conf_t; overload; static;
     class function NewConfiguration(const Keys, Values: TArray<PAnsiChar>; const DefaultCallBacks: Boolean = True): prd_kafka_conf_t; overload; static;
@@ -64,10 +72,12 @@ type
     class function NewConsumer(const Configuration: prd_kafka_conf_t): prd_kafka_t; overload; static;
     class function NewConsumer(const Configuration: prd_kafka_conf_t; const Brokers: PAnsiChar; const Topics: TArray<PAnsiChar>; const Partitions: TArray<Integer>; const Handler: TConsumerMessageHandlerProc): TKafkaConsumer; overload; static;
 
-    class function NewTopic(const KafkaHandle: prd_kafka_t; const TopicName: String; const TopicConfiguration: prd_kafka_topic_conf_t = nil): prd_kafka_topic_t;
+    class function NewTopic(const KafkaHandle: prd_kafka_t; const TopicName: PAnsiChar; const TopicConfiguration: prd_kafka_topic_conf_t = nil): prd_kafka_topic_t;
 
     class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payload: Pointer; const PayloadLength: NativeUInt; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer = nil): Integer; overload;
-    class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payload: String; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer = nil): Integer; overload;
+    class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payload: AnsiString; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer = nil): Integer; overload;
+    class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payloads: TArray<AnsiString>; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer = nil): Integer; overload;
+    class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payloads: TArray<Pointer>; const PayloadLengths: TArray<Integer>; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer = nil): Integer; overload;
 
     class procedure FlushLogs;
 
@@ -77,6 +87,7 @@ type
   TKafkaHelper = class
   public
     class function PointerToStr(const Value: Pointer; const Len: Integer): String; static;
+    class function IsKafkaError(const Error: rd_kafka_resp_err_t): Boolean; static;
   end;
 
 implementation
@@ -90,6 +101,8 @@ resourcestring
   StrErrorCallBackReaso = 'Error_CallBack'#10'Reason =  %s';
   StrLogCallBackFac = 'Log_CallBack - fac = %s, buff = %s';
   StrMessageSendResult = 'Message send result = %d';
+  StrBrokersCouldNotBe = 'Brokers could not be added';
+  StrCriticalError = 'Critical Error: ';
 
 class constructor TKafka.Create;
 begin
@@ -106,29 +119,27 @@ procedure ProducerCallBackLogger(rk: prd_kafka_t; rkmessage: prd_kafka_message_t
 begin
   if rkmessage <> nil then
   begin
-    TKafka.Log(format(StrMessageSendResult, [Integer(rkmessage.err)]));
+    TKafka.Log(format(StrMessageSendResult, [Integer(rkmessage.err)]), TKafkaLogType.kltProducer);
   end;
 end;
 
 procedure LogCallBackLogger(rk: prd_kafka_t; level: integer; fac: PAnsiChar;
   buf: PAnsiChar); cdecl;
 begin
-  // The Producer's Errors come through this routine
-  TKafka.Log(format(StrLogCallBackFac, [String(fac), String(buf)]));
+  TKafka.Log(format(StrLogCallBackFac, [String(fac), String(buf)]), TKafkaLogType.kltLog);
 end;
 
 procedure ErrorCallBackLogger(rk: prd_kafka_t; err: integer; reason: PAnsiChar;
   opaque: Pointer); cdecl;
 begin
-  // The Consumers's Errors come through this routine
-  TKafka.Log(format(StrErrorCallBackReaso, [String(reason)]));
+  TKafka.Log(format(StrErrorCallBackReaso, [String(reason)]), kltError);
 end;
 
-class procedure TKafka.DoLog(const Text: String);
+class procedure TKafka.DoLog(const Text: String; const LogType: TKafkaLogType);
 begin
   TMonitor.Enter(TKafka.FLogStrings);
   try
-    TKafka.FLogStrings.Add(Text);
+    TKafka.FLogStrings.AddObject(Text, TObject(LogType));
   finally
     TMonitor.Exit(TKafka.FLogStrings);
   end;
@@ -149,9 +160,9 @@ begin
   end;
 end;
 
-class procedure TKafka.Log(const Text: String);
+class procedure TKafka.Log(const Text: String; const LogType: TKafkaLogType);
 begin
-  DoLog(Text);
+  DoLog(Text, LogType);
 end;
 
 class function TKafka.NewConfiguration(const Keys: TArray<PAnsiChar>; const Values: TArray<PAnsiChar>; const DefaultCallBacks: Boolean): prd_kafka_conf_t;
@@ -221,11 +232,11 @@ begin
   end;
 end;
 
-class function TKafka.NewTopic(const KafkaHandle: prd_kafka_t; const TopicName: String; const TopicConfiguration: prd_kafka_topic_conf_t): prd_kafka_topic_t;
+class function TKafka.NewTopic(const KafkaHandle: prd_kafka_t; const TopicName: PAnsiChar; const TopicConfiguration: prd_kafka_topic_conf_t): prd_kafka_topic_t;
 begin
   Result := rd_kafka_topic_new(
     KafkaHandle,
-    PAnsiChar(PWideChar(TopicName)),
+    TopicName,
     TopicConfiguration);
 
   if Result = nil then
@@ -264,7 +275,48 @@ begin
   end;
 end;
 
-class function TKafka.Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payload: String;
+class function TKafka.Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payloads: TArray<Pointer>;
+  const PayloadLengths: TArray<Integer>; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer): Integer;
+var
+  i: Integer;
+  Msgs: TArray<rd_kafka_message_t>;
+  Msg: rd_kafka_message_t;
+begin
+  if length(Payloads) = 0 then
+  begin
+    Result := 0;
+  end
+  else
+  begin
+    SetLength(Msgs, length(Payloads));
+
+    for i := Low(Payloads) to High(Payloads) do
+    begin
+      Msg.partition := Partition;
+      Msg.rkt := Topic;
+      Msg.payload := Payloads[i];
+      Msg.len := PayloadLengths[i];
+      Msg.key := Key;
+      Msg.key_len := KeyLen;
+
+      Msgs[i] := Msg;
+    end;
+
+    Result := rd_kafka_produce_batch(
+      Topic,
+      Partition,
+      MsgFlags,
+      @Msgs[0],
+      length(Payloads));
+
+    if Result <> length(Payloads) then
+    begin
+      raise EKafkaError.Create(StrMessageNotQueued);
+    end;
+  end;
+end;
+
+class function TKafka.Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payload: AnsiString;
   const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer): Integer;
 begin
   Result := Produce(
@@ -344,6 +396,13 @@ end;
 
 { TKafkaHelper }
 
+class function TKafkaHelper.IsKafkaError(const Error: rd_kafka_resp_err_t): Boolean;
+begin
+  Result :=
+    (Error <> RD_KAFKA_RESP_ERR_NO_ERROR) and
+    (Error <> RD_KAFKA_RESP_ERR__PARTITION_EOF);
+end;
+
 class function TKafkaHelper.PointerToStr(const Value: Pointer; const Len: Integer): String;
 begin
   Result := copy(String(PAnsiChar(Value)), 1, len);
@@ -376,7 +435,7 @@ begin
 
   if rd_kafka_brokers_add(FKafkaHandle, FBrokers) = 0 then
   begin
-    raise EKafkaError.Create('Brokers could not be added');
+    raise EKafkaError.Create(StrBrokersCouldNotBe);
   end;
 
   rd_kafka_poll_set_consumer(FKafkaHandle);
@@ -387,7 +446,7 @@ begin
   begin
     rd_kafka_topic_partition_list_add(
       TopicList,
-      PAnsiChar(PWideChar(FTopics[i])),
+      FTopics[i],
       FPartitions[i]);
   end;
 
@@ -400,34 +459,30 @@ procedure TKafkaConsumer.DoExecute;
 var
   Msg: prd_kafka_message_t;
 begin
-  while not TThread.CurrentThread.CheckTerminated do
-  begin
-    Msg := rd_kafka_consumer_poll(FKafkaHandle, 1000);
+  Msg := rd_kafka_consumer_poll(FKafkaHandle, 1000);
 
-    if Msg <> nil then
-    try
-      if Integer(Msg.err) <> 0 then
+  if Msg <> nil then
+  try
+    if TKafkaHelper.IsKafkaError(Msg.err) then
+    begin
+      TKafka.Log(format('Message error - %d', [Integer(Msg.err)]), TKafkaLogType.kltConsumer);
+    end else
+    begin
+      if Msg.key_len <> 0 then
       begin
-        TKafka.Log(format('Message error - %d', [Integer(Msg.err)]));
-      end else
-      begin
-        if Msg.key_len <> 0 then
-        begin
-          TKafka.Log(format('Key received - %s', [TKafkaHelper.PointerToStr(Msg.key, Msg.key_len)]));
-        end;
+        TKafka.Log(format('Key received - %s', [TKafkaHelper.PointerToStr(Msg.key, Msg.key_len)]), TKafkaLogType.kltConsumer);
+      end;
 
-        if Msg.len <> 0 then
+      if Msg.len <> 0 then
+      begin
+        if Assigned(FHandler) then
         begin
-          if Assigned(FHandler) then
-          begin
-            FHandler(Msg);
-          end;
-          //TKafka.Log(format('Message received - %s', [msg]));
+          FHandler(Msg);
         end;
       end;
-    finally
-      rd_kafka_message_destroy(Msg);
     end;
+  finally
+    rd_kafka_message_destroy(Msg);
   end;
 end;
 
@@ -435,7 +490,7 @@ procedure TKafkaConsumer.DoCleanUp;
 begin
   if FKafkaHandle <> nil then
   begin
-    rd_kafka_consumer_close(FKafkaHandle);
+    //rd_kafka_consumer_close(FKafkaHandle);
     rd_kafka_destroy(FKafkaHandle);
   end;
 end;
@@ -454,15 +509,18 @@ begin
           begin
             DoExecute;
           end;
+
+          DoCleanUp;
         except
           on e: Exception do
           begin
-            AcquireExceptionObject;
+            TKafka.Log(StrCriticalError + e.Message, TKafkaLogType.kltConsumer);
+
+            DoCleanUp;
           end;
         end;
-
-        DoCleanUp;
       end);
+
     FThread.OnTerminate := OnThreadTerminate;
     FThread.FreeOnTerminate := True;
     FThread.Start;
@@ -480,6 +538,33 @@ begin
   begin
     FThread.Terminate;
   end;
+end;
+
+class function TKafka.Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payloads: TArray<AnsiString>;
+  const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer): Integer;
+var
+  PayloadPointers: TArray<Pointer>;
+  PayloadLengths: TArray<Integer>;
+  i: Integer;
+begin
+  SetLength(PayloadPointers, length(Payloads));
+  SetLength(PayloadLengths, length(Payloads));
+
+  for i := Low(Payloads) to High(Payloads) do
+  begin
+    PayloadPointers[i] := @PayLoads[i][1];
+    PayloadLengths[i] := length(PayLoads[i]);
+  end;
+
+  Result := Produce(
+    Topic,
+    Partition,
+    MsgFlags,
+    PayloadPointers,
+    PayloadLengths,
+    Key,
+    KeyLen,
+    MsgOpaque);
 end;
 
 end.

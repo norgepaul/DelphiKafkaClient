@@ -11,6 +11,13 @@ type
 
   TKafkaErrorArray= Array [0 .. 512] of AnsiChar;
 
+  TKafkaLogType = (
+    kltLog,
+    kltError,
+    kltProducer,
+    kltConsumer
+  );
+
 implementation
 
 end.
