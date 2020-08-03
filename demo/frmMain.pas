@@ -80,40 +80,21 @@ begin
 end;
 
 procedure TfrmKafkaDemo.actStartConsumingExecute(Sender: TObject);
-var
-  Configuration: prd_kafka_conf_t;
-  TopicConfiguration: prd_kafka_topic_conf_t;
-  TopicName: PAnsiChar;
-  Brokers: PAnsiChar;
 begin
   if FKafkaConsumer = nil then
   begin
-    Brokers := KafkaServers;
-    TopicName := DefaultTopic;
-
-    Configuration := TKafka.NewConfiguration(
-      ['group.id'],
-      ['GroupID']);
-
-    TopicConfiguration := TKafka.NewTopicConfiguration(
-      ['auto.offset.reset'],
-      ['earliest']);
-
-    rd_kafka_conf_set_default_topic_conf(
-      Configuration,
-      TopicConfiguration);
-
     FKafkaConsumer := TKafka.NewConsumer(
-      Configuration,
-      Brokers,
-      [TopicName],
+      ['group.id'],
+      ['GroupID'],
+      ['auto.offset.reset'],
+      ['earliest'],
+      KafkaServers,
+      [DefaultTopic],
       [0],
       procedure(const Msg: prd_kafka_message_t)
       begin
         TKafka.Log(format('Message received - %s', [TKafkaHelper.PointerToStr(Msg.payload, Msg.len)]), TKafkaLogType.kltConsumer);
       end);
-
-    FKafkaConsumer.Start;
   end;
 end;
 
@@ -121,9 +102,7 @@ procedure TfrmKafkaDemo.actStopConsumingExecute(Sender: TObject);
 begin
   if FKafkaConsumer <> nil then
   begin
-    FKafkaConsumer.Free;
-
-    FKafkaConsumer := nil;
+    FreeAndNil(FKafkaConsumer);
   end;
 end;
 
@@ -140,7 +119,7 @@ var
   Configuration: prd_kafka_conf_t;
   KafkaHandle: prd_kafka_t;
   Topic: prd_kafka_topic_t;
-  Msgs: TArray<AnsiString>;
+  Msgs: TArray<String>;
   i: Integer;
 begin
   Configuration := TKafka.NewConfiguration(
@@ -159,7 +138,7 @@ begin
 
       for i := 0 to pred(Trunc(edtMessageCount.Value)) do
       begin
-        Msgs[i] := AnsiString(DefaultMessage + ' - ' + DateTimeToStr(now) + '.' + MilliSecondOf(now).ToString.PadLeft(3, '0'));
+        Msgs[i] := DefaultMessage + ' - ' + DateTimeToStr(now) + '.' + MilliSecondOf(now).ToString.PadLeft(3, '0');
       end;
 
       TKafka.Produce(
