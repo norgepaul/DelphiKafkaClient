@@ -44,7 +44,7 @@ type
     constructor Create(const Configuration: prd_kafka_conf_t; const Handler: TConsumerMessageHandlerProc; const Brokers: String; const Topics: TArray<String>; const Partitions: TArray<Integer>);
   end;
 
-  TKafkaConsumer = class
+  TKafkaConsumer = class(TInterfacedObject, IKafkaConsumer)
   private
     procedure OnThreadTerminate(Sender: TObject);
     function GetConsumedCount: Int64;
@@ -57,18 +57,28 @@ type
     property ConsumedCount: Int64 read GetConsumedCount;
   end;
 
-  TKafkaProducer = class
+  TKafkaProducer = class(TInterfacedObject, IKafkaProducer)
+  private
+    FProducedCount: Int64;
+
+    function GetKafkaHandle: prd_kafka_t;
+    function GetProducedCount: Int64;
   protected
     FKafkaHandle: prd_kafka_t;
     FConfiguration: prd_kafka_conf_t;
   public
-    constructor Create(const ConfigurationKeys, ConfigurationValues: TArray<String>);
+    constructor Create(const ConfigurationKeys, ConfigurationValues: TArray<String>); overload;
+    constructor Create(const Configuration: prd_kafka_conf_t); overload;
+
     destructor Destroy; override;
 
     function Produce(const Topic: String; const Payload: Pointer; const PayloadLength: NativeUInt; const Key: Pointer = nil; const KeyLen: NativeUInt = 0; const Partition: Int32 = RD_KAFKA_PARTITION_UA; const MsgFlags: Integer = RD_KAFKA_MSG_F_COPY; const MsgOpaque: Pointer = nil): Integer; overload;
     function Produce(const Topic: String; const Payload: String; const Key: Pointer = nil; const KeyLen: NativeUInt = 0; const Partition: Int32 = RD_KAFKA_PARTITION_UA; const MsgFlags: Integer = RD_KAFKA_MSG_F_COPY; const MsgOpaque: Pointer = nil): Integer; overload;
     function Produce(const Topic: String; const Payloads: TArray<Pointer>; const PayloadLengths: TArray<Integer>; const Key: Pointer = nil; const KeyLen: NativeUInt = 0; const Partition: Int32 = RD_KAFKA_PARTITION_UA; const MsgFlags: Integer = RD_KAFKA_MSG_F_COPY; const MsgOpaque: Pointer = nil): Integer; overload;
     function Produce(const Topic: String; const Payloads: TArray<String>; const Key: Pointer = nil; const KeyLen: NativeUInt = 0; const Partition: Int32 = RD_KAFKA_PARTITION_UA; const MsgFlags: Integer = RD_KAFKA_MSG_F_COPY; const MsgOpaque: Pointer = nil): Integer; overload;
+
+    property ProducedCount: Int64 read GetProducedCount;
+    property KafkaHandle: prd_kafka_t read GetKafkaHandle;
   end;
 
   TKafka = class
@@ -94,10 +104,12 @@ type
     class procedure SetTopicConfigurationValue(var TopicConfiguration: prd_kafka_topic_conf_t; const Key, Value: String); static;
     class procedure DestroyTopicConfiguration(const TopicConfiguration: Prd_kafka_topic_conf_t); static;
 
-    class function NewProducer(const Configuration: prd_kafka_conf_t): prd_kafka_t; static;
+    class function NewProducer(const Configuration: prd_kafka_conf_t): prd_kafka_t; overload; static;
+    class function NewProducer(const ConfigKeys, ConfigValues: TArray<String>): prd_kafka_t; overload; static;
+
     class function NewConsumer(const Configuration: prd_kafka_conf_t): prd_kafka_t; overload; static;
-    class function NewConsumer(const ConfigKeys, ConfigValues, ConfigTopicKeys, ConfigTopicValues: TArray<String>; const Brokers: String; const Topics: TArray<String>; const Partitions: TArray<Integer>; const Handler: TConsumerMessageHandlerProc): TKafkaConsumer; overload; static;
     class function NewConsumer(const Configuration: prd_kafka_conf_t; const Brokers: String; const Topics: TArray<String>; const Partitions: TArray<Integer>; const Handler: TConsumerMessageHandlerProc): TKafkaConsumer; overload; static;
+
     class procedure ConsumerClose(const KafkaHandle: prd_kafka_t); static;
     class procedure DestroyHandle(const KafkaHandle: prd_kafka_t); static;
 
@@ -107,6 +119,8 @@ type
     class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payload: String; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer = nil): Integer; overload;
     class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payloads: TArray<String>; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer = nil): Integer; overload;
     class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payloads: TArray<Pointer>; const PayloadLengths: TArray<Integer>; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer = nil): Integer; overload;
+
+    class procedure Flush(const KafkaHandle: prd_kafka_t; const Timeout: Integer = 1000);
 
     class procedure FlushLogs;
 
@@ -184,6 +198,11 @@ begin
   end;
 end;
 
+class procedure TKafka.Flush(const KafkaHandle: prd_kafka_t; const Timeout: Integer);
+begin
+  rd_kafka_flush(KafkaHandle, Timeout);
+end;
+
 class procedure TKafka.FlushLogs;
 begin
   TMonitor.Enter(TKafka.FLogStrings);
@@ -238,31 +257,15 @@ begin
   end;
 end;
 
-class function TKafka.NewConsumer(const ConfigKeys, ConfigValues, ConfigTopicKeys, ConfigTopicValues: TArray<String>; const Brokers: String;
-  const Topics: TArray<String>; const Partitions: TArray<Integer>; const Handler: TConsumerMessageHandlerProc): TKafkaConsumer;
+class function TKafka.NewProducer(const ConfigKeys, ConfigValues: TArray<String>): prd_kafka_t;
 var
   Configuration: prd_kafka_conf_t;
-  TopicConfiguration: prd_kafka_topic_conf_t;
 begin
   Configuration := TKafka.NewConfiguration(
     ConfigKeys,
     ConfigValues);
 
-  TopicConfiguration := TKafka.NewTopicConfiguration(
-    ConfigTopicKeys,
-    ConfigTopicValues);
-
-  rd_kafka_conf_set_default_topic_conf(
-    Configuration,
-    TopicConfiguration);
-
-  Result := TKafka.NewConsumer(
-    Configuration,
-    Brokers,
-    Topics,
-    Partitions,
-    Handler
-  );
+  Result := NewProducer(Configuration);
 end;
 
 class function TKafka.NewConsumer(const Configuration: prd_kafka_conf_t; const Brokers: String;
@@ -664,7 +667,29 @@ begin
     ConfigurationKeys,
     ConfigurationValues);
 
+  Create(Configuration);
+end;
+
+constructor TKafkaProducer.Create(const Configuration: prd_kafka_conf_t);
+begin
   FKafkaHandle := TKafka.NewProducer(Configuration);
+end;
+
+destructor TKafkaProducer.Destroy;
+begin
+  rd_kafka_destroy(FKafkaHandle);
+
+  inherited;
+end;
+
+function TKafkaProducer.GetKafkaHandle: prd_kafka_t;
+begin
+  Result := FKafkaHandle;
+end;
+
+function TKafkaProducer.GetProducedCount: Int64;
+begin
+  TInterlocked.Exchange(Result, FProducedCount);
 end;
 
 function TKafkaProducer.Produce(const Topic: String; const Payload: String; const Key: Pointer; const KeyLen: NativeUInt; const Partition: Int32; const MsgFlags: Integer;
@@ -691,7 +716,6 @@ begin
     FKafkaHandle,
     Topic,
     nil);
-
   try
     Result := TKafka.Produce(
       KTopic,
@@ -703,7 +727,7 @@ begin
       KeyLen,
       MsgOpaque);
 
-    rd_kafka_flush(FKafkaHandle, 1000);
+    TInterlocked.Increment(FProducedCount);
   finally
     rd_kafka_topic_destroy(KTopic);
   end;
@@ -711,21 +735,53 @@ end;
 
 function TKafkaProducer.Produce(const Topic: String; const Payloads: TArray<Pointer>; const PayloadLengths: TArray<Integer>; const Key: Pointer; const KeyLen: NativeUInt;
   const Partition: Int32; const MsgFlags: Integer; const MsgOpaque: Pointer): Integer;
+var
+  KTopic: prd_kafka_topic_t;
 begin
+  KTopic := TKafka.NewTopic(
+    FKafkaHandle,
+    Topic,
+    nil);
+  try
+    Result := TKafka.Produce(
+      KTopic,
+      Partition,
+      MsgFlags,
+      Payloads,
+      PayloadLengths,
+      Key,
+      KeyLen,
+      MsgOpaque);
 
-end;
-
-destructor TKafkaProducer.Destroy;
-begin
-  rd_kafka_destroy(FKafkaHandle);
-
-  inherited;
+    TInterlocked.Add(FProducedCount, Length(Payloads));
+  finally
+    rd_kafka_topic_destroy(KTopic);
+  end;
 end;
 
 function TKafkaProducer.Produce(const Topic: String; const Payloads: TArray<String>; const Key: Pointer; const KeyLen: NativeUInt; const Partition: Int32;
   const MsgFlags: Integer; const MsgOpaque: Pointer): Integer;
+var
+  KTopic: prd_kafka_topic_t;
 begin
+  KTopic := TKafka.NewTopic(
+    FKafkaHandle,
+    Topic,
+    nil);
+  try
+    Result := TKafka.Produce(
+      KTopic,
+      Partition,
+      MsgFlags,
+      Payloads,
+      Key,
+      KeyLen,
+      MsgOpaque);
 
+    TInterlocked.Add(FProducedCount, Length(Payloads));
+  finally
+    rd_kafka_topic_destroy(KTopic);
+  end;
 end;
 
 end.

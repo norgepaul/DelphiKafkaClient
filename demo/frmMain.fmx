@@ -21,7 +21,8 @@ object frmKafkaDemo: TfrmKafkaDemo
     Size.PlatformDefault = False
     object Layout2: TLayout
       Align = Top
-      Position.Y = 28.000000000000000000
+      Margins.Bottom = 3.000000000000000000
+      Position.Y = 51.000000000000000000
       Size.Width = 337.000000000000000000
       Size.Height = 25.000000000000000000
       Size.PlatformDefault = False
@@ -46,8 +47,10 @@ object frmKafkaDemo: TfrmKafkaDemo
       end
     end
     object Layout3: TLayout
-      Align = MostTop
+      Align = Top
+      Margins.Top = 3.000000000000000000
       Margins.Bottom = 3.000000000000000000
+      Position.Y = 23.000000000000000000
       Size.Width = 337.000000000000000000
       Size.Height = 25.000000000000000000
       Size.PlatformDefault = False
@@ -74,12 +77,38 @@ object frmKafkaDemo: TfrmKafkaDemo
         Size.PlatformDefault = False
       end
     end
+    object lblStatus: TLabel
+      Align = MostTop
+      Margins.Bottom = 3.000000000000000000
+      Size.Width = 337.000000000000000000
+      Size.Height = 17.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object chkLogCallbacks: TCheckBox
+      Align = Top
+      Margins.Bottom = 3.000000000000000000
+      Position.Y = 101.000000000000000000
+      Size.Width = 337.000000000000000000
+      Size.Height = 19.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Log Callbacks'
+    end
+    object chkFlushAfterProduce: TCheckBox
+      Align = Top
+      IsChecked = True
+      Margins.Bottom = 3.000000000000000000
+      Position.Y = 79.000000000000000000
+      Size.Width = 337.000000000000000000
+      Size.Height = 19.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Flush after Produce'
+    end
   end
-  object tmrLog: TTimer
+  object tmrUpdate: TTimer
     Interval = 20
-    OnTimer = tmrLogTimer
+    OnTimer = tmrUpdateTimer
     Left = 79
-    Top = 72
+    Top = 440
   end
   object GridPanelLayout1: TGridPanelLayout
     Align = Client
@@ -88,10 +117,10 @@ object frmKafkaDemo: TfrmKafkaDemo
     Size.PlatformDefault = False
     ColumnCollection = <
       item
-        Value = 33.500849888580990000
+        Value = 33.500849888580980000
       end
       item
-        Value = 33.333032027156600000
+        Value = 33.333032027156610000
       end
       item
         Value = 33.166118084262400000
@@ -115,6 +144,9 @@ object frmKafkaDemo: TfrmKafkaDemo
     RowCollection = <
       item
         Value = 100.000000000000000000
+      end
+      item
+        SizeStyle = Auto
       end>
     object memLogProducer: TMemo
       Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
@@ -171,7 +203,7 @@ object frmKafkaDemo: TfrmKafkaDemo
   object ActionList1: TActionList
     OnUpdate = ActionList1Update
     Left = 24
-    Top = 72
+    Top = 440
     object actProduceMessage: TAction
       Text = 'Produce Messages'
       OnExecute = actProduceMessageExecute
