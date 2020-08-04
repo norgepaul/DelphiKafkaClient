@@ -4,14 +4,16 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes,
-  System.Variants, System.Actions,
+  System.Variants, System.Actions, System.DateUtils, System.SyncObjs,
 
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
   FMX.Controls.Presentation, FMX.StdCtrls, FMX.ActnList, FMX.Memo.Types, FMX.ScrollBox,
-  FMX.Memo, FMX.Layouts,
+  FMX.Edit, FMX.EditBox, FMX.SpinBox, FMX.Memo, FMX.Layouts,
 
   Kafka.Lib,
-  Kafka.Classes,
+  Kafka.Factory,
+  Kafka.Interfaces,
+  Kafka.Helper,
   Kafka.Types;
 
 type
@@ -21,22 +23,54 @@ type
     ActionList1: TActionList;
     actProduceMessage: TAction;
     actStartConsuming: TAction;
-    Layout1: TLayout;
-    Button1: TButton;
-    memLog: TMemo;
-    tmrLog: TTimer;
-    Layout2: TLayout;
-    Button2: TButton;
+    tmrUpdate: TTimer;
     actStopConsuming: TAction;
+    GridPanelLayout1: TGridPanelLayout;
+    actFlush: TAction;
+    GroupBox2: TGroupBox;
+    layConsumeControl: TLayout;
+    btnConsumingStart: TButton;
     Button3: TButton;
+    memLogConsumer: TMemo;
+    GroupBox1: TGroupBox;
+    Layout3: TLayout;
+    edtMessageCount: TSpinBox;
+    Button1: TButton;
+    Button4: TButton;
+    chkFlushAfterProduce: TCheckBox;
+    memLogProducer: TMemo;
+    chkLogProduceCallbacks: TCheckBox;
+    chkLogConsumeCallbacks: TCheckBox;
+    Options: TGroupBox;
+    memLogOther: TMemo;
+    lblStatus: TLabel;
+    GroupBox3: TGroupBox;
+    Layout1: TLayout;
+    Label1: TLabel;
+    edtKafkaServer: TEdit;
+    Layout2: TLayout;
+    Label2: TLabel;
+    edtTopic: TEdit;
+    Layout4: TLayout;
+    Label3: TLabel;
+    edtMessage: TEdit;
     procedure actProduceMessageExecute(Sender: TObject);
     procedure actStartConsumingExecute(Sender: TObject);
-    procedure tmrLogTimer(Sender: TObject);
+    procedure tmrUpdateTimer(Sender: TObject);
     procedure actStopConsumingExecute(Sender: TObject);
+    procedure ActionList1Update(Action: TBasicAction; var Handled: Boolean);
+    procedure actFlushExecute(Sender: TObject);
+    procedure layConsumeControlResize(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure edtKafkaServerChange(Sender: TObject);
+    procedure edtTopicChange(Sender: TObject);
   private
-    FKafkaConsumer: TKafkaConsumer;
+    FKafkaProducer: IKafkaProducer;
+    FKafkaConsumer: IKafkaConsumer;
 
     procedure OnLog(const Values: TStrings);
+    procedure UpdateStatus;
+    procedure DestroyClasses;
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -50,110 +84,99 @@ implementation
 
 { TfrmKafkaDemo }
 
-const
-  KafkaServers = '127.0.0.1:9092';
-  DefaultTopic = 'test';
-  DefaultMessage = 'This is a test message';
-
 procedure TfrmKafkaDemo.OnLog(const Values: TStrings);
 var
   i: Integer;
+  Memo: TMemo;
 begin
-  memLog.BeginUpdate;
-  try
-    for i := 0 to pred(Values.Count) do
-    begin
-      memLog.Lines.Add(Values[i]);
+  for i := 0 to pred(Values.Count) do
+  begin
+    case TKafkaLogType(Values.Objects[i]) of
+      kltProducer: Memo := memLogProducer;
+      kltConsumer: Memo := memLogConsumer;
+    else
+      Memo := memLogOther;
     end;
 
-    if not memLog.IsFocused then
-    begin
-      memLog.ScrollBy(0, MaxInt, False);
+    if (Memo = memLogOther) or
+       ((chkLogProduceCallbacks.IsChecked) and (Memo = memLogProducer)) or
+       ((chkLogConsumeCallbacks.IsChecked) and (Memo = memLogConsumer)) then
+    begin    
+      Memo.Lines.Add(Values[i]);
     end;
-  finally
-    memLog.EndUpdate;
   end;
 end;
 
 procedure TfrmKafkaDemo.actStartConsumingExecute(Sender: TObject);
-var
-  Configuration: prd_kafka_conf_t;
-  TopicConfiguration: prd_kafka_topic_conf_t;
-  TopicName: PAnsiChar;
-  Subscribing: Boolean;
-  Brokers: PAnsiChar;
 begin
   if FKafkaConsumer = nil then
   begin
-    Brokers := KafkaServers;
-    TopicName := DefaultTopic;
-
-    Configuration := TKafka.NewConfiguration(
+    FKafkaConsumer := TKafkaFactory.NewConsumer(
       ['group.id'],
-      ['GroupID']);
-
-    TopicConfiguration := TKafka.NewTopicConfiguration(
+      ['GroupID'],
       ['auto.offset.reset'],
-      ['earliest']);
-
-    rd_kafka_conf_set_default_topic_conf(
-      Configuration,
-      TopicConfiguration);
-
-    FKafkaConsumer := TKafka.NewConsumer(
-      Configuration,
-      Brokers,
-      [TopicName],
+      ['earliest'],
+      edtKafkaServer.Text,
+      [edtTopic.Text],
       [0],
       procedure(const Msg: prd_kafka_message_t)
       begin
-        TKafka.Log(format('Message received - %s', [TKafkaHelper.PointerToStr(Msg.payload, Msg.len)]));
+        // This is called from the consumer thread, but TKafka.Log is threadsafe
+        TKafkaHelper.Log(format('Message received - %s', [TKafkaHelper.PointerToStr(Msg.payload, Msg.len)]), TKafkaLogType.kltConsumer);
       end);
-
-    FKafkaConsumer.Start;
   end;
 end;
 
 procedure TfrmKafkaDemo.actStopConsumingExecute(Sender: TObject);
 begin
-  if FKafkaConsumer <> nil then
-  begin
-    FKafkaConsumer.Free;
-  end;
+  FKafkaConsumer := nil;
+end;
+
+procedure TfrmKafkaDemo.actFlushExecute(Sender: TObject);
+begin
+  TKafkaHelper.Flush(FKafkaProducer.KafkaHandle);
+end;
+
+procedure TfrmKafkaDemo.ActionList1Update(Action: TBasicAction; var Handled: Boolean);
+begin
+  actStartConsuming.Enabled := (FKafkaConsumer = nil) and (edtKafkaServer.Text <> '');
+  actStopConsuming.Enabled := FKafkaConsumer <> nil;
+  actFlush.Enabled := FKafkaProducer <> nil;
+
+  Handled := True;
 end;
 
 procedure TfrmKafkaDemo.actProduceMessageExecute(Sender: TObject);
 var
-  Configuration: prd_kafka_conf_t;
-  KafkaHandle: prd_kafka_t;
-  Topic: prd_kafka_topic_t;
+  Msgs: TArray<String>;
+  i: Integer;
 begin
-  Configuration := TKafka.NewConfiguration(
-    ['bootstrap.servers'],
-    [KafkaServers]);
+  if FKafkaProducer = nil then
+  begin
+    FKafkaProducer := TKafkaFactory.NewProducer(
+      ['bootstrap.servers'],
+      [edtKafkaServer.Text]);
+  end;
 
-  KafkaHandle := TKafka.NewProducer(Configuration);
-  try
-    Topic := TKafka.NewTopic(
-      KafkaHandle,
-      DefaultTopic,
-      nil);
-    try
-      TKafka.Produce(
-        Topic,
-        RD_KAFKA_PARTITION_UA,
-        RD_KAFKA_MSG_F_COPY,
-        DefaultMessage,
-        nil,
-        0,
-        nil);
+  SetLength(Msgs, Trunc(edtMessageCount.Value));
 
-      rd_kafka_flush(KafkaHandle, 1000);
-    finally
-      rd_kafka_topic_destroy(Topic);
-    end;
-  finally
-    rd_kafka_destroy(KafkaHandle);
+  for i := 0 to pred(Trunc(edtMessageCount.Value)) do
+  begin
+    Msgs[i] := edtMessage.Text + ' - ' + DateTimeToStr(now) + '.' + MilliSecondOf(now).ToString.PadLeft(3, '0');
+  end;
+
+  FKafkaProducer.Produce(
+    edtTopic.Text,
+    Msgs,
+    nil,
+    0,
+    RD_KAFKA_PARTITION_UA,
+    RD_KAFKA_MSG_F_COPY,
+    nil);
+
+  if chkFlushAfterProduce.IsChecked then
+  begin
+    TKafkaHelper.Flush(FKafkaProducer.KafkaHandle);
   end;
 end;
 
@@ -161,12 +184,70 @@ constructor TfrmKafkaDemo.Create(AOwner: TComponent);
 begin
   inherited;
 
-  TKafka.OnLog := OnLog;
+  TKafkaHelper.OnLog := OnLog;
+
+  UpdateStatus;
 end;
 
-procedure TfrmKafkaDemo.tmrLogTimer(Sender: TObject);
+procedure TfrmKafkaDemo.edtKafkaServerChange(Sender: TObject);
 begin
-  TKafka.FlushLogs;
+  DestroyClasses;
+end;
+
+procedure TfrmKafkaDemo.edtTopicChange(Sender: TObject);
+begin
+  FKafkaConsumer := nil;
+end;
+
+procedure TfrmKafkaDemo.DestroyClasses;
+begin
+  FKafkaProducer := nil;
+  FKafkaConsumer := nil;
+end;
+
+procedure TfrmKafkaDemo.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  DestroyClasses;
+
+  // Wait for all the threads to terminate
+  sleep(1000);
+end;
+
+procedure TfrmKafkaDemo.layConsumeControlResize(Sender: TObject);
+begin
+  btnConsumingStart.Width := (layConsumeControl.Width - 20) / 2;
+end;
+
+procedure TfrmKafkaDemo.tmrUpdateTimer(Sender: TObject);
+begin
+  UpdateStatus;
+end;
+
+procedure TfrmKafkaDemo.UpdateStatus;
+var
+  ProducedStr, ConsumedStr: String;
+begin
+  TKafkaHelper.FlushLogs;
+
+  if FKafkaProducer = nil then
+  begin
+    ProducedStr := 'Idle';
+  end
+  else
+  begin
+    ProducedStr := FKafkaProducer.ProducedCount.ToString;
+  end;
+
+  if FKafkaConsumer = nil then
+  begin
+    ConsumedStr := 'Idle';
+  end
+  else
+  begin
+    ConsumedStr := FKafkaConsumer.ConsumedCount.ToString;
+  end;
+
+  lblStatus.Text := format('Produced: %s | Consumed: %s', [ProducedStr, ConsumedStr]);
 end;
 
 end.
