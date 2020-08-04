@@ -85,3 +85,6 @@ In addition there are two additional interfaced classes dedicated to Producing a
           end);
       end;
     end;
+
+# Thanks
+Shouts go out to @Zhikter and @HeZiHang for some initial inspiration and code examples.
