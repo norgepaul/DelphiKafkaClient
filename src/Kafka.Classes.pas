@@ -9,6 +9,9 @@ uses
   Kafka.Types,
   Kafka.Lib;
 
+const
+  ConsumerPollTimeout = 100;
+
 type
   EKafkaError = class(Exception);
 
@@ -42,6 +45,7 @@ type
     procedure DoCleanUp; override;
   public
     constructor Create(const Configuration: prd_kafka_conf_t; const Handler: TConsumerMessageHandlerProc; const Brokers: String; const Topics: TArray<String>; const Partitions: TArray<Integer>);
+    destructor Destroy; override;
   end;
 
   TKafkaConsumer = class(TInterfacedObject, IKafkaConsumer)
@@ -79,6 +83,12 @@ type
 
     property ProducedCount: Int64 read GetProducedCount;
     property KafkaHandle: prd_kafka_t read GetKafkaHandle;
+  end;
+
+  TKafkaHelper = class
+  public
+    class function PointerToStr(const Value: Pointer; const Len: Integer): String; static;
+    class function IsKafkaError(const Error: rd_kafka_resp_err_t): Boolean; static;
   end;
 
   TKafka = class
@@ -127,12 +137,6 @@ type
     class property OnLog: TOnLog read FOnLog write FOnLog;
   end;
 
-  TKafkaHelper = class
-  public
-    class function PointerToStr(const Value: Pointer; const Len: Integer): String; static;
-    class function IsKafkaError(const Error: rd_kafka_resp_err_t): Boolean; static;
-  end;
-
 implementation
 
 resourcestring
@@ -147,25 +151,7 @@ resourcestring
   StrBrokersCouldNotBe = 'Brokers could not be added';
   StrCriticalError = 'Critical Error: ';
 
-class procedure TKafka.ConsumerClose(const KafkaHandle: prd_kafka_t);
-begin
-  rd_kafka_consumer_close(KafkaHandle);
-end;
-
-class procedure TKafka.DestroyHandle(const KafkaHandle: prd_kafka_t);
-begin
-  rd_kafka_destroy(KafkaHandle);
-end;
-
-class constructor TKafka.Create;
-begin
-  FLogStrings := TStringList.Create;
-end;
-
-class destructor TKafka.Destroy;
-begin
-  FreeAndNil(FLogStrings);
-end;
+// Global callbacks
 
 procedure ProducerCallBackLogger(rk: prd_kafka_t; rkmessage: prd_kafka_message_t;
   opaque: Pointer); cdecl;
@@ -186,6 +172,28 @@ procedure ErrorCallBackLogger(rk: prd_kafka_t; err: integer; reason: PAnsiChar;
   opaque: Pointer); cdecl;
 begin
   TKafka.Log(format(StrErrorCallBackReaso, [String(reason)]), kltError);
+end;
+
+{ TKafka }
+
+class procedure TKafka.ConsumerClose(const KafkaHandle: prd_kafka_t);
+begin
+  rd_kafka_consumer_close(KafkaHandle);
+end;
+
+class procedure TKafka.DestroyHandle(const KafkaHandle: prd_kafka_t);
+begin
+  rd_kafka_destroy(KafkaHandle);
+end;
+
+class constructor TKafka.Create;
+begin
+  FLogStrings := TStringList.Create;
+end;
+
+class destructor TKafka.Destroy;
+begin
+  FreeAndNil(FLogStrings);
 end;
 
 class procedure TKafka.DoLog(const Text: String; const LogType: TKafkaLogType);
@@ -557,11 +565,18 @@ constructor TKafkaConnectionThread.Create(const Configuration: prd_kafka_conf_t;
 begin
   inherited Create(True);
 
+  FreeOnTerminate := True;
+
   FConfiguration := Configuration;
   FHandler := Handler;
   FBrokers := Brokers;
   FTopics := Topics;
   FPartitions := Partitions;
+end;
+
+destructor TKafkaConnectionThread.Destroy;
+begin
+  inherited;
 end;
 
 procedure TKafkaConnectionThread.DoCleanUp;
@@ -577,7 +592,7 @@ procedure TKafkaConnectionThread.DoExecute;
 var
   Msg: prd_kafka_message_t;
 begin
-  Msg := rd_kafka_consumer_poll(FKafkaHandle, 1000);
+  Msg := rd_kafka_consumer_poll(FKafkaHandle, ConsumerPollTimeout);
 
   if Msg <> nil then
   try

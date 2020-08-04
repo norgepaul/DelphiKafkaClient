@@ -23,32 +23,41 @@ type
     ActionList1: TActionList;
     actProduceMessage: TAction;
     actStartConsuming: TAction;
-    Layout1: TLayout;
     tmrUpdate: TTimer;
-    Layout2: TLayout;
-    Button2: TButton;
     actStopConsuming: TAction;
+    GridPanelLayout1: TGridPanelLayout;
+    actFlush: TAction;
+    GroupBox2: TGroupBox;
+    layConsumeControl: TLayout;
+    btnConsumingStart: TButton;
     Button3: TButton;
+    memLogConsumer: TMemo;
+    GroupBox1: TGroupBox;
     Layout3: TLayout;
     edtMessageCount: TSpinBox;
     Button1: TButton;
-    GridPanelLayout1: TGridPanelLayout;
+    Button4: TButton;
+    chkFlushAfterProduce: TCheckBox;
     memLogProducer: TMemo;
-    memLogConsumer: TMemo;
+    chkLogProduceCallbacks: TCheckBox;
+    chkLogConsumeCallbacks: TCheckBox;
+    Options: TGroupBox;
     memLogOther: TMemo;
     lblStatus: TLabel;
-    chkLogCallbacks: TCheckBox;
-    chkFlushAfterProduce: TCheckBox;
     procedure actProduceMessageExecute(Sender: TObject);
     procedure actStartConsumingExecute(Sender: TObject);
     procedure tmrUpdateTimer(Sender: TObject);
     procedure actStopConsumingExecute(Sender: TObject);
     procedure ActionList1Update(Action: TBasicAction; var Handled: Boolean);
+    procedure actFlushExecute(Sender: TObject);
+    procedure layConsumeControlResize(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
     FKafkaProducer: IKafkaProducer;
     FKafkaConsumer: IKafkaConsumer;
 
     procedure OnLog(const Values: TStrings);
+    procedure UpdateStatus;
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -81,8 +90,9 @@ begin
       Memo := memLogOther;
     end;
 
-    if (Memo = memLogOther) or 
-       (chkLogCallbacks.IsChecked) then
+    if (Memo = memLogOther) or
+       ((chkLogProduceCallbacks.IsChecked) and (Memo = memLogProducer)) or
+       ((chkLogConsumeCallbacks.IsChecked) and (Memo = memLogConsumer)) then
     begin    
       Memo.Lines.Add(Values[i]);
     end;
@@ -113,10 +123,16 @@ begin
   FKafkaConsumer := nil;
 end;
 
+procedure TfrmKafkaDemo.actFlushExecute(Sender: TObject);
+begin
+  TKafka.Flush(FKafkaProducer.KafkaHandle);
+end;
+
 procedure TfrmKafkaDemo.ActionList1Update(Action: TBasicAction; var Handled: Boolean);
 begin
   actStartConsuming.Enabled := FKafkaConsumer = nil;
   actStopConsuming.Enabled := FKafkaConsumer <> nil;
+  actFlush.Enabled := FKafkaProducer <> nil;
 
   Handled := True;
 end;
@@ -151,7 +167,7 @@ begin
 
   if chkFlushAfterProduce.IsChecked then
   begin
-    TKafka.Flush(FKafkaProducer.KafkaHandle, 1000);
+    TKafka.Flush(FKafkaProducer.KafkaHandle);
   end;
 end;
 
@@ -160,10 +176,31 @@ begin
   inherited;
 
   TKafka.OnLog := OnLog;
+
+  UpdateStatus;
+end;
+
+procedure TfrmKafkaDemo.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  FKafkaProducer := nil;
+  FKafkaConsumer := nil;
+
+  // Wait for all the threads to terminate
+  sleep(1000);
+end;
+
+procedure TfrmKafkaDemo.layConsumeControlResize(Sender: TObject);
+begin
+  btnConsumingStart.Width := (layConsumeControl.Width - 20) / 2;
 end;
 
 procedure TfrmKafkaDemo.tmrUpdateTimer(Sender: TObject);
-var 
+begin
+  UpdateStatus;
+end;
+
+procedure TfrmKafkaDemo.UpdateStatus;
+var
   ProducedStr, ConsumedStr: String;
 begin
   TKafka.FlushLogs;
@@ -185,7 +222,7 @@ begin
   begin
     ConsumedStr := FKafkaConsumer.ConsumedCount.ToString;
   end;
-  
+
   lblStatus.Text := format('Produced: %s | Consumed: %s', [ProducedStr, ConsumedStr]);
 end;
 
