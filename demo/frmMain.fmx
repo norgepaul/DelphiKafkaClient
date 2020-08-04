@@ -19,7 +19,7 @@ object frmKafkaDemo: TfrmKafkaDemo
   object GridPanelLayout1: TGridPanelLayout
     Align = Client
     Size.Width = 1470.000000000000000000
-    Size.Height = 745.000000000000000000
+    Size.Height = 692.000000000000000000
     Size.PlatformDefault = False
     ColumnCollection = <
       item
@@ -61,7 +61,7 @@ object frmKafkaDemo: TfrmKafkaDemo
       Padding.Right = 10.000000000000000000
       Padding.Bottom = 10.000000000000000000
       Size.Width = 489.995574951171900000
-      Size.Height = 745.000000000000000000
+      Size.Height = 692.000000000000000000
       Size.PlatformDefault = False
       Text = 'Consume'
       object layConsumeControl: TLayout
@@ -102,10 +102,10 @@ object frmKafkaDemo: TfrmKafkaDemo
         TextSettings.Font.Size = 14.000000000000000000
         Align = Client
         Size.Width = 469.995574951171900000
-        Size.Height = 667.000000000000000000
+        Size.Height = 614.000000000000000000
         Size.PlatformDefault = False
         Viewport.Width = 466.000000000000000000
-        Viewport.Height = 663.000000000000000000
+        Viewport.Height = 610.000000000000000000
       end
       object chkLogConsumeCallbacks: TCheckBox
         Align = Top
@@ -126,7 +126,7 @@ object frmKafkaDemo: TfrmKafkaDemo
       Padding.Right = 10.000000000000000000
       Padding.Bottom = 10.000000000000000000
       Size.Width = 492.462493896484400000
-      Size.Height = 745.000000000000000000
+      Size.Height = 692.000000000000000000
       Size.PlatformDefault = False
       Text = 'Produce'
       object Layout3: TLayout
@@ -193,10 +193,10 @@ object frmKafkaDemo: TfrmKafkaDemo
         TextSettings.Font.Size = 14.000000000000000000
         Align = Client
         Size.Width = 472.462493896484400000
-        Size.Height = 614.000000000000000000
+        Size.Height = 561.000000000000000000
         Size.PlatformDefault = False
         Viewport.Width = 468.500000000000000000
-        Viewport.Height = 610.000000000000000000
+        Viewport.Height = 557.000000000000000000
       end
       object chkLogProduceCallbacks: TCheckBox
         Align = Top
@@ -217,7 +217,7 @@ object frmKafkaDemo: TfrmKafkaDemo
       Padding.Right = 10.000000000000000000
       Padding.Bottom = 10.000000000000000000
       Size.Width = 487.541931152343800000
-      Size.Height = 745.000000000000000000
+      Size.Height = 692.000000000000000000
       Size.PlatformDefault = False
       Text = 'Status'
       object memLogOther: TMemo
@@ -232,10 +232,10 @@ object frmKafkaDemo: TfrmKafkaDemo
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 3.000000000000000000
         Size.Width = 464.541931152343800000
-        Size.Height = 691.000000000000000000
+        Size.Height = 638.000000000000000000
         Size.PlatformDefault = False
         Viewport.Width = 460.500000000000000000
-        Viewport.Height = 687.000000000000000000
+        Viewport.Height = 634.000000000000000000
       end
       object lblStatus: TLabel
         Align = Top
@@ -246,6 +246,98 @@ object frmKafkaDemo: TfrmKafkaDemo
         Size.Height = 17.000000000000000000
         Size.PlatformDefault = False
         Text = '-'
+      end
+    end
+  end
+  object GroupBox3: TGroupBox
+    Align = MostTop
+    Padding.Left = 10.000000000000000000
+    Padding.Top = 18.000000000000000000
+    Padding.Right = 10.000000000000000000
+    Padding.Bottom = 10.000000000000000000
+    Size.Width = 1470.000000000000000000
+    Size.Height = 53.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Configuration'
+    object Layout1: TLayout
+      Align = Left
+      Margins.Right = 10.000000000000000000
+      Position.X = 10.000000000000000000
+      Position.Y = 18.000000000000000000
+      Size.Width = 255.000000000000000000
+      Size.Height = 25.000000000000000000
+      Size.PlatformDefault = False
+      object Label1: TLabel
+        Align = MostLeft
+        AutoSize = True
+        Margins.Right = 3.000000000000000000
+        Size.Width = 57.000000000000000000
+        Size.Height = 25.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Trailing
+        Text = 'Server'
+      end
+      object edtKafkaServer: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Client
+        Text = '127.0.0.1:9092'
+        Size.Width = 195.000000000000000000
+        Size.Height = 25.000000000000000000
+        Size.PlatformDefault = False
+        OnChange = edtKafkaServerChange
+      end
+    end
+    object Layout2: TLayout
+      Align = Left
+      Margins.Right = 10.000000000000000000
+      Position.X = 275.000000000000000000
+      Position.Y = 18.000000000000000000
+      Size.Width = 255.000000000000000000
+      Size.Height = 25.000000000000000000
+      Size.PlatformDefault = False
+      object Label2: TLabel
+        Align = MostLeft
+        AutoSize = True
+        Margins.Right = 3.000000000000000000
+        Size.Width = 57.000000000000000000
+        Size.Height = 25.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Trailing
+        Text = 'Topic'
+      end
+      object edtTopic: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Client
+        Text = 'test'
+        Size.Width = 195.000000000000000000
+        Size.Height = 25.000000000000000000
+        Size.PlatformDefault = False
+        OnChange = edtTopicChange
+      end
+    end
+    object Layout4: TLayout
+      Align = Client
+      Margins.Right = 10.000000000000000000
+      Size.Width = 910.000000000000000000
+      Size.Height = 25.000000000000000000
+      Size.PlatformDefault = False
+      object Label3: TLabel
+        Align = MostLeft
+        AutoSize = True
+        Margins.Right = 3.000000000000000000
+        Size.Width = 57.000000000000000000
+        Size.Height = 25.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Trailing
+        Text = 'Message'
+      end
+      object edtMessage: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Client
+        Text = 'Test message '#248#230#229' - '#20320#22909
+        Size.Width = 850.000000000000000000
+        Size.Height = 25.000000000000000000
+        Size.PlatformDefault = False
       end
     end
   end

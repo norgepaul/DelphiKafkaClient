@@ -13,7 +13,7 @@ uses
   Kafka.Lib,
   Kafka.Factory,
   Kafka.Interfaces,
-  Kafka.Classes,
+  Kafka.Helper,
   Kafka.Types;
 
 type
@@ -44,6 +44,16 @@ type
     Options: TGroupBox;
     memLogOther: TMemo;
     lblStatus: TLabel;
+    GroupBox3: TGroupBox;
+    Layout1: TLayout;
+    Label1: TLabel;
+    edtKafkaServer: TEdit;
+    Layout2: TLayout;
+    Label2: TLabel;
+    edtTopic: TEdit;
+    Layout4: TLayout;
+    Label3: TLabel;
+    edtMessage: TEdit;
     procedure actProduceMessageExecute(Sender: TObject);
     procedure actStartConsumingExecute(Sender: TObject);
     procedure tmrUpdateTimer(Sender: TObject);
@@ -52,12 +62,15 @@ type
     procedure actFlushExecute(Sender: TObject);
     procedure layConsumeControlResize(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure edtKafkaServerChange(Sender: TObject);
+    procedure edtTopicChange(Sender: TObject);
   private
     FKafkaProducer: IKafkaProducer;
     FKafkaConsumer: IKafkaConsumer;
 
     procedure OnLog(const Values: TStrings);
     procedure UpdateStatus;
+    procedure DestroyClasses;
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -70,11 +83,6 @@ implementation
 {$R *.fmx}
 
 { TfrmKafkaDemo }
-
-const
-  KafkaServers = '127.0.0.1:9092';
-  DefaultTopic = 'test';
-  DefaultMessage = 'This is a test message';
 
 procedure TfrmKafkaDemo.OnLog(const Values: TStrings);
 var
@@ -108,12 +116,13 @@ begin
       ['GroupID'],
       ['auto.offset.reset'],
       ['earliest'],
-      KafkaServers,
-      [DefaultTopic],
+      edtKafkaServer.Text,
+      [edtTopic.Text],
       [0],
       procedure(const Msg: prd_kafka_message_t)
       begin
-        TKafka.Log(format('Message received - %s', [TKafkaHelper.PointerToStr(Msg.payload, Msg.len)]), TKafkaLogType.kltConsumer);
+        // This is called from the consumer thread, but TKafka.Log is threadsafe
+        TKafkaHelper.Log(format('Message received - %s', [TKafkaHelper.PointerToStr(Msg.payload, Msg.len)]), TKafkaLogType.kltConsumer);
       end);
   end;
 end;
@@ -125,12 +134,12 @@ end;
 
 procedure TfrmKafkaDemo.actFlushExecute(Sender: TObject);
 begin
-  TKafka.Flush(FKafkaProducer.KafkaHandle);
+  TKafkaHelper.Flush(FKafkaProducer.KafkaHandle);
 end;
 
 procedure TfrmKafkaDemo.ActionList1Update(Action: TBasicAction; var Handled: Boolean);
 begin
-  actStartConsuming.Enabled := FKafkaConsumer = nil;
+  actStartConsuming.Enabled := (FKafkaConsumer = nil) and (edtKafkaServer.Text <> '');
   actStopConsuming.Enabled := FKafkaConsumer <> nil;
   actFlush.Enabled := FKafkaProducer <> nil;
 
@@ -146,18 +155,18 @@ begin
   begin
     FKafkaProducer := TKafkaFactory.NewProducer(
       ['bootstrap.servers'],
-      [KafkaServers]);
+      [edtKafkaServer.Text]);
   end;
 
   SetLength(Msgs, Trunc(edtMessageCount.Value));
 
   for i := 0 to pred(Trunc(edtMessageCount.Value)) do
   begin
-    Msgs[i] := DefaultMessage + ' - ' + DateTimeToStr(now) + '.' + MilliSecondOf(now).ToString.PadLeft(3, '0');
+    Msgs[i] := edtMessage.Text + ' - ' + DateTimeToStr(now) + '.' + MilliSecondOf(now).ToString.PadLeft(3, '0');
   end;
 
   FKafkaProducer.Produce(
-    DefaultTopic,
+    edtTopic.Text,
     Msgs,
     nil,
     0,
@@ -167,7 +176,7 @@ begin
 
   if chkFlushAfterProduce.IsChecked then
   begin
-    TKafka.Flush(FKafkaProducer.KafkaHandle);
+    TKafkaHelper.Flush(FKafkaProducer.KafkaHandle);
   end;
 end;
 
@@ -175,15 +184,30 @@ constructor TfrmKafkaDemo.Create(AOwner: TComponent);
 begin
   inherited;
 
-  TKafka.OnLog := OnLog;
+  TKafkaHelper.OnLog := OnLog;
 
   UpdateStatus;
 end;
 
-procedure TfrmKafkaDemo.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+procedure TfrmKafkaDemo.edtKafkaServerChange(Sender: TObject);
+begin
+  DestroyClasses;
+end;
+
+procedure TfrmKafkaDemo.edtTopicChange(Sender: TObject);
+begin
+  FKafkaConsumer := nil;
+end;
+
+procedure TfrmKafkaDemo.DestroyClasses;
 begin
   FKafkaProducer := nil;
   FKafkaConsumer := nil;
+end;
+
+procedure TfrmKafkaDemo.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  DestroyClasses;
 
   // Wait for all the threads to terminate
   sleep(1000);
@@ -203,7 +227,7 @@ procedure TfrmKafkaDemo.UpdateStatus;
 var
   ProducedStr, ConsumedStr: String;
 begin
-  TKafka.FlushLogs;
+  TKafkaHelper.FlushLogs;
 
   if FKafkaProducer = nil then
   begin

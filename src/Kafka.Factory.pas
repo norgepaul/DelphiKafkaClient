@@ -6,6 +6,7 @@ uses
   Kafka.Interfaces,
   Kafka.Types,
   Kafka.Classes,
+  Kafka.Helper,
   Kafka.Lib;
 
 type
@@ -28,11 +29,11 @@ var
   Configuration: prd_kafka_conf_t;
   TopicConfiguration: prd_kafka_topic_conf_t;
 begin
-  Configuration := TKafka.NewConfiguration(
+  Configuration := TKafkaHelper.NewConfiguration(
     ConfigKeys,
     ConfigValues);
 
-  TopicConfiguration := TKafka.NewTopicConfiguration(
+  TopicConfiguration := TKafkaHelper.NewTopicConfiguration(
     ConfigTopicKeys,
     ConfigTopicValues);
 
@@ -58,7 +59,7 @@ class function TKafkaFactory.NewProducer(const ConfigurationKeys, ConfigurationV
 var
   Configuration: prd_kafka_conf_t;
 begin
-  Configuration := TKafka.NewConfiguration(
+  Configuration := TKafkaHelper.NewConfiguration(
     ConfigurationKeys,
     ConfigurationValues);
 
