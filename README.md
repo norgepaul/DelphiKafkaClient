@@ -20,7 +20,7 @@ Once unstalled, right click the **Linux platform** item under the KafkaDemo proj
 Copy the **.dll** files from the `lib` folder into the application output directory.
 
 ##  Code
-All Kafka functionality can be accessed via the header translations in `Kafka.Lib`. To make life easier, many of the common Kafka functions are wrapped in the `Kafka.Classes.TKafka` class.
+All Kafka functionality can be accessed via the header translations in `Kafka.Lib`. To make life easier, many of the common Kafka functions are wrapped in the `Kafka.Helper.TKafkaHelper` class.
 In addition there are two additional interfaced classes dedicated to Producing and Consuming messages.
 ### IKafkaProducer
 
