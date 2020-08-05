@@ -1,0 +1,161 @@
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\SysInit.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Types.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Base.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Dlfcn.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.StdDef.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.SysTypes.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Fcntl.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.SysStat.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Signal.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Time.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.SysTime.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Locale.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.SysConst.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Iconv.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Dirent.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Errno.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Fnmatch.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Langinfo.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Sched.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Pthread.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Stdio.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Stdlib.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.String_.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.SysSysctl.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Unistd.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Utime.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Wordexp.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Pwd.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Semaphore.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.SysUtsname.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Wchar.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.Wctype.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Internal.ICU.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.RTLConsts.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Character.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Internal.ExcUtils.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.SysUtils.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Math.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.TimeSpan.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Diagnostics.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.SyncObjs.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.VarUtils.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Variants.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Generics.Collections.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.SysMman.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Hash.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Rtti.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.TypInfo.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Generics.Defaults.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.StrOpts.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Posix.SysSelect.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Linuxapi.KernelDefs.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\Linuxapi.KernelIoctl.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Classes.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Masks.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.StrUtils.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.DateUtils.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.IOUtils.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.StartUpCopy.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.UITypes.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Messaging.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Analytics.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Math.Vectors.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Actions.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.ImageList.o"
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Consts.o
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Linux.Devices.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Devices.o"
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.DialogService.Sync.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Dialogs.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Surfaces.o
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.UIConsts.o"
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.TextLayout.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Utils.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Graphics.o
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.RegularExpressionsAPI.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.RegularExpressionsConsts.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.RegularExpressionsCore.o"
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.RegularExpressions.o"
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Text.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.BehaviorManager.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Styles.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.VirtualKeyboard.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Materials.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Types3D.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Filter.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Filter.Custom.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Effects.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.MultiResBitmap.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Ani.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.AcceleratorKey.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.FontGlyphs.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Objects.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.DialogService.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Gestures.Linux.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Gestures.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Controls.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.ImgList.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Menus.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMUX.Api.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.MultiTouch.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.MultiTouch.Linux.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Controls.Linux.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Printer.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Printer.Linux.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Canvas.Linux.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\Linux.OpenGL.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Context.Linux.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.StdActns.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Presentation.Messages.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Controls.Model.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Presentation.Factory.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Presentation.Style.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Controls.Presentation.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Styles.Objects.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Styles.Switch.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Switch.Style.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.StdCtrls.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.InertialMovement.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Layouts.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.MagnifierGlass.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.SpellChecker.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Edit.Style.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Edit.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.DialogHelper.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Dialogs.Default.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Dialogs.Linux.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Helpers.Linux.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Platform.Linux.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Platform.Common.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Clipboard.Linux.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Clipboard.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Platform.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.ActnList.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Types.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Materials.Canvas.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Canvas.GPU.Helpers.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.StrokeBuilder.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Canvas.GPU.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.TextLayout.GPU.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Header.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Forms.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Memo.Types.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.ScrollBox.Style.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.ScrollBox.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.EditBox.Style.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.EditBox.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.SpinBox.Style.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.SpinBox.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Memo.Style.o
+C:\\Users\\Public\\Documents\\Embarcadero\\Studio\\21.0\\CatalogRepository\\FmxLinux-1.46\\Lib\\Linux64\\Release\\FMX.Memo.o
+F:\\Projects\\GitHub\\KafkaDelphi\\demo\\Linux64\\Debug\\Kafka.Lib.o
+F:\\Projects\\GitHub\\KafkaDelphi\\demo\\Linux64\\Debug\\Kafka.Interfaces.o
+F:\\Projects\\GitHub\\KafkaDelphi\\demo\\Linux64\\Debug\\Kafka.Types.o
+"c:\\program files (x86)\\embarcadero\\studio\\21.0\\lib\\Linux64\\debug\\System.Threading.o"
+F:\\Projects\\GitHub\\KafkaDelphi\\demo\\Linux64\\Debug\\Kafka.Helper.o
+F:\\Projects\\GitHub\\KafkaDelphi\\demo\\Linux64\\Debug\\Kafka.Classes.o
+F:\\Projects\\GitHub\\KafkaDelphi\\demo\\Linux64\\Debug\\Kafka.Factory.o
+F:\\Projects\\GitHub\\KafkaDelphi\\demo\\Linux64\\Debug\\frmMain.o
+.\\Linux64\\Debug\\KafkaDemo.o

@@ -9,7 +9,8 @@ uses
   Kafka.Classes in '..\src\Kafka.Classes.pas',
   Kafka.Interfaces in '..\src\Kafka.Interfaces.pas',
   Kafka.Factory in '..\src\Kafka.Factory.pas',
-  Kafka.Helper in '..\src\Kafka.Helper.pas';
+  Kafka.Helper in '..\src\Kafka.Helper.pas',
+  Kafka.Serializer in '..\src\Kafka.Serializer.pas';
 
 {$R *.res}
 

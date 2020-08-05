@@ -3,10 +3,11 @@ unit Kafka.Helper;
 interface
 
 uses
-  System.SysUtils, System.Classes,
+  System.SysUtils, System.Classes, System.Rtti,
 
   Kafka.Types,
-  Kafka.Lib;
+  Kafka.Lib,
+  Kafka.Serializer;
 
 type
   EKafkaError = class(Exception);
@@ -51,6 +52,7 @@ type
     class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payload: String; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer = nil): Integer; overload;
     class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payloads: TArray<String>; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer = nil): Integer; overload;
     class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payloads: TArray<Pointer>; const PayloadLengths: TArray<Integer>; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer = nil): Integer; overload;
+    class function Produce<P, K>(const Topic: prd_kafka_topic_t; const Payload: P; const Key: K; const MsgFlags: Integer; const Partition: Int32; const MsgOpaque: Pointer = nil): Integer; overload;
 
     class procedure Flush(const KafkaHandle: prd_kafka_t; const Timeout: Integer = 1000);
 
@@ -316,6 +318,27 @@ begin
       raise EKafkaError.Create(StrMessageNotQueued);
     end;
   end;
+end;
+
+class function TKafkaHelper.Produce<P, K>(const Topic: prd_kafka_topic_t; const Payload: P; const Key: K; const MsgFlags: Integer; const Partition: Int32;
+  const MsgOpaque: Pointer): Integer;
+var
+  PayloadPointer, KeyPointer: Pointer;
+  PayloadLen, KeyLen: Integer;
+  PayloadValue, KeyValue: TValue;
+begin
+  PayloadValue := TKafkaSerializer.Serialize<P>(Payload);
+  KeyValue := TKafkaSerializer.Serialize<K>(Key);
+
+  Result := Produce(
+    Topic,
+    Partition,
+    MsgFlags,
+    PayloadValue.GetReferenceToRawData,
+    PayloadValue.DataSize,
+    KeyValue.GetReferenceToRawData,
+    KeyValue.DataSize,
+    MsgOpaque);
 end;
 
 class function TKafkaHelper.Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payload: String;

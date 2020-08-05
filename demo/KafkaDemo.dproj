@@ -5,7 +5,7 @@
         <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
-        <Platform Condition="'$(Platform)'==''">Linux64</Platform>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>131</TargetedPlatforms>
         <AppType>Application</AppType>
         <MainSource>KafkaDemo.dpr</MainSource>
@@ -297,6 +297,7 @@
         <DCCReference Include="..\src\Kafka.Interfaces.pas"/>
         <DCCReference Include="..\src\Kafka.Factory.pas"/>
         <DCCReference Include="..\src\Kafka.Helper.pas"/>
+        <DCCReference Include="..\src\Kafka.Serializer.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

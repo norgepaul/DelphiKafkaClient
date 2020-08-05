@@ -3,7 +3,7 @@ unit frmMain;
 interface
 
 uses
-  System.SysUtils, System.Types, System.UITypes, System.Classes,
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Rtti,
   System.Variants, System.Actions, System.DateUtils, System.SyncObjs,
 
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
@@ -14,11 +14,11 @@ uses
   Kafka.Factory,
   Kafka.Interfaces,
   Kafka.Helper,
-  Kafka.Types;
+  Kafka.Classes,
+  Kafka.Types,
+  Kafka.Serializer;
 
 type
-  EKafkaError = class(Exception);
-
   TfrmKafkaDemo = class(TForm)
     ActionList1: TActionList;
     actProduceMessage: TAction;
@@ -120,9 +120,13 @@ begin
       [edtTopic.Text],
       [0],
       procedure(const Msg: prd_kafka_message_t)
+      var
+        Value: TValue;
       begin
         // This is called from the consumer thread, but TKafka.Log is threadsafe
-        TKafkaHelper.Log(format('Message received - %s', [TKafkaHelper.PointerToStr(Msg.payload, Msg.len)]), TKafkaLogType.kltConsumer);
+        Value := TKafkaSerializer.DeSerialize<String>(Msg.payload, Msg.Len);
+
+        TKafkaHelper.Log(format('Message received - %s', [Value.AsString]), TKafkaLogType.kltConsumer);
       end);
   end;
 end;
@@ -165,14 +169,23 @@ begin
     Msgs[i] := edtMessage.Text + ' - ' + DateTimeToStr(now) + '.' + MilliSecondOf(now).ToString.PadLeft(3, '0');
   end;
 
-  FKafkaProducer.Produce(
+  TKafkaProducer(FKafkaProducer).Produce<String, String>(
+    edtTopic.Text,
+    Msgs[0],
+    'test1',
+    RD_KAFKA_MSG_F_COPY,
+    RD_KAFKA_PARTITION_UA,
+    nil);
+
+
+(*  FKafkaProducer.Produce(
     edtTopic.Text,
     Msgs,
     nil,
     0,
     RD_KAFKA_PARTITION_UA,
     RD_KAFKA_MSG_F_COPY,
-    nil);
+    nil);*)
 
   if chkFlushAfterProduce.IsChecked then
   begin

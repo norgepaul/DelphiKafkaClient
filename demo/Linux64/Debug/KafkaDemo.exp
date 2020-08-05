@@ -1,0 +1,11 @@
+{
+		__rsrc_*;
+		__rstr_*;
+		__init_record_*;
+		dbkFCallWrapperAddr;
+		dbk_RTL_initialized;
+		__dbk_fcall_wrapper;
+		_DbgExcNotify;
+		SignalConverter;
+		TMethodImplementationIntercept;
+};
