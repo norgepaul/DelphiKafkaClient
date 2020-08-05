@@ -318,7 +318,7 @@ object frmKafkaDemo: TfrmKafkaDemo
     object Layout4: TLayout
       Align = Client
       Margins.Right = 10.000000000000000000
-      Size.Width = 910.000000000000000000
+      Size.Width = 645.000000000000000000
       Size.Height = 25.000000000000000000
       Size.PlatformDefault = False
       object Label3: TLabel
@@ -335,9 +335,37 @@ object frmKafkaDemo: TfrmKafkaDemo
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         Align = Client
         Text = 'Test message '#248#230#229' - '#20320#22909
-        Size.Width = 850.000000000000000000
+        Size.Width = 585.000000000000000000
         Size.Height = 25.000000000000000000
         Size.PlatformDefault = False
+      end
+    end
+    object Layout5: TLayout
+      Align = Left
+      Margins.Right = 10.000000000000000000
+      Position.X = 540.000000000000000000
+      Position.Y = 18.000000000000000000
+      Size.Width = 255.000000000000000000
+      Size.Height = 25.000000000000000000
+      Size.PlatformDefault = False
+      object Label4: TLabel
+        Align = MostLeft
+        AutoSize = True
+        Margins.Right = 3.000000000000000000
+        Size.Width = 57.000000000000000000
+        Size.Height = 25.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Trailing
+        Text = 'Key'
+      end
+      object edtKey: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Client
+        Text = 'key'
+        Size.Width = 195.000000000000000000
+        Size.Height = 25.000000000000000000
+        Size.PlatformDefault = False
+        OnChange = edtTopicChange
       end
     end
   end

@@ -48,14 +48,15 @@ type
     class function NewTopic(const KafkaHandle: prd_kafka_t; const TopicName: String; const TopicConfiguration: prd_kafka_topic_conf_t = nil): prd_kafka_topic_t;
 
     class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payload: Pointer; const PayloadLength: NativeUInt; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer = nil): Integer; overload;
-    class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payload: String; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer = nil): Integer; overload;
-    class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payloads: TArray<String>; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer = nil): Integer; overload;
+    class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payload: String; const Key: String; const MsgOpaque: Pointer = nil): Integer; overload;
+    class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payloads: TArray<String>; const Key: String; const MsgOpaque: Pointer = nil): Integer; overload;
     class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payloads: TArray<Pointer>; const PayloadLengths: TArray<Integer>; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer = nil): Integer; overload;
 
     class procedure Flush(const KafkaHandle: prd_kafka_t; const Timeout: Integer = 1000);
 
     // Helpers
     class function PointerToStr(const Value: Pointer; const Len: Integer): String; static;
+    class function StrToPointer(const Value: String; var Pntr: Pointer; var Len: Integer): String; static;
     class function IsKafkaError(const Error: rd_kafka_resp_err_t): Boolean; static;
 
     // Internal
@@ -319,16 +320,22 @@ begin
 end;
 
 class function TKafkaHelper.Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payload: String;
-  const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer): Integer;
+  const Key: String; const MsgOpaque: Pointer): Integer;
+var
+  PayloadPointer, KeyPointer: Pointer;
+  PayloadLength, KeyLength: Integer;
 begin
+  StrToPointer(Payload, PayloadPointer, PayloadLength);
+  StrToPointer(Key, KeyPointer, KeyLength);
+
   Result := Produce(
     Topic,
     Partition,
     MsgFlags,
-    @PAnsiChar(AnsiString(Payload))[1],
-    Length(Payload),
-    Key,
-    KeyLen,
+    PayloadPointer,
+    PayloadLength,
+    KeyPointer,
+    KeyLength,
     MsgOpaque)
 end;
 
@@ -396,6 +403,24 @@ begin
   end;
 end;
 
+class function TKafkaHelper.StrToPointer(const Value: String; var Pntr: Pointer; var Len: Integer): String;
+var
+  x: String;
+begin
+  if Value = '' then
+  begin
+    Pntr := nil;
+    Len := 0;
+  end
+  else
+  begin
+    Pntr := @Value[1];
+    Len := Length(Value) * 2;
+  end;
+
+  X := PointerToStr(Pntr, Len);
+end;
+
 { TKafkaHelper }
 
 class function TKafkaHelper.IsKafkaError(const Error: rd_kafka_resp_err_t): Boolean;
@@ -406,27 +431,43 @@ begin
 end;
 
 class function TKafkaHelper.PointerToStr(const Value: Pointer; const Len: Integer): String;
+var
+  i: Integer;
 begin
-  Result := copy(String(PAnsiChar(Value)), 1, len);
+  Result := '';
+
+  if Value <> nil then
+  begin
+    SetLength(Result, Len div 2);
+
+    for i := 1 to Len div 2 do
+    begin
+      Result[i] := String(Value)[i];
+    end;
+  end;
 end;
 
 class function TKafkaHelper.Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payloads: TArray<String>;
-  const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer): Integer;
+  const Key: String; const MsgOpaque: Pointer): Integer;
 var
   PayloadPointers: TArray<Pointer>;
   PayloadLengths: TArray<Integer>;
+  PayloadPointer, KeyPointer: Pointer;
+  PayloadLength, KeyLength: Integer;
   i: Integer;
-  TempStr: AnsiString;
+  TempStr: String;
 begin
   SetLength(PayloadPointers, length(Payloads));
   SetLength(PayloadLengths, length(Payloads));
 
+  StrToPointer(Key, KeyPointer, KeyLength);
+
   for i := Low(Payloads) to High(Payloads) do
   begin
-    TempStr := AnsiString(Payloads[i]);
+    StrToPointer(Payloads[i], PayloadPointer, PayloadLength);
 
-    PayloadPointers[i] := @TempStr[1];
-    PayloadLengths[i] := length(TempStr);
+    PayloadPointers[i] := PayloadPointer;
+    PayloadLengths[i] := PayloadLength;
   end;
 
   Result := Produce(
@@ -435,8 +476,8 @@ begin
     MsgFlags,
     PayloadPointers,
     PayloadLengths,
-    Key,
-    KeyLen,
+    KeyPointer,
+    KeyLength,
     MsgOpaque);
 end;
 

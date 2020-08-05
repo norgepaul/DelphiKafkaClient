@@ -73,9 +73,9 @@ type
     destructor Destroy; override;
 
     function Produce(const Topic: String; const Payload: Pointer; const PayloadLength: NativeUInt; const Key: Pointer = nil; const KeyLen: NativeUInt = 0; const Partition: Int32 = RD_KAFKA_PARTITION_UA; const MsgFlags: Integer = RD_KAFKA_MSG_F_COPY; const MsgOpaque: Pointer = nil): Integer; overload;
-    function Produce(const Topic: String; const Payload: String; const Key: Pointer = nil; const KeyLen: NativeUInt = 0; const Partition: Int32 = RD_KAFKA_PARTITION_UA; const MsgFlags: Integer = RD_KAFKA_MSG_F_COPY; const MsgOpaque: Pointer = nil): Integer; overload;
+    function Produce(const Topic: String; const Payload: String; const Key: String; const Partition: Int32 = RD_KAFKA_PARTITION_UA; const MsgFlags: Integer = RD_KAFKA_MSG_F_COPY; const MsgOpaque: Pointer = nil): Integer; overload;
     function Produce(const Topic: String; const Payloads: TArray<Pointer>; const PayloadLengths: TArray<Integer>; const Key: Pointer = nil; const KeyLen: NativeUInt = 0; const Partition: Int32 = RD_KAFKA_PARTITION_UA; const MsgFlags: Integer = RD_KAFKA_MSG_F_COPY; const MsgOpaque: Pointer = nil): Integer; overload;
-    function Produce(const Topic: String; const Payloads: TArray<String>; const Key: Pointer = nil; const KeyLen: NativeUInt = 0; const Partition: Int32 = RD_KAFKA_PARTITION_UA; const MsgFlags: Integer = RD_KAFKA_MSG_F_COPY; const MsgOpaque: Pointer = nil): Integer; overload;
+    function Produce(const Topic: String; const Payloads: TArray<String>; const Key: String; const Partition: Int32 = RD_KAFKA_PARTITION_UA; const MsgFlags: Integer = RD_KAFKA_MSG_F_COPY; const MsgOpaque: Pointer = nil): Integer; overload;
 
     property ProducedCount: Int64 read GetProducedCount;
     property KafkaHandle: prd_kafka_t read GetKafkaHandle;
@@ -124,25 +124,12 @@ begin
 
   if Msg <> nil then
   try
-    if TKafkaHelper.IsKafkaError(Msg.err) then
+    if (Msg.err <> RD_KAFKA_RESP_ERR__PARTITION_EOF) and
+       (Assigned(FHandler)) then
     begin
-      TKafkaHelper.Log(format('Message error - %d', [Integer(Msg.err)]), TKafkaLogType.kltConsumer);
-    end else
-    begin
-      if Msg.key_len <> 0 then
-      begin
-        TKafkaHelper.Log(format('Key received - %s', [TKafkaHelper.PointerToStr(Msg.key, Msg.key_len)]), TKafkaLogType.kltConsumer);
-      end;
+      TInterlocked.Increment(FConsumedCount);
 
-      if Msg.len <> 0 then
-      begin
-        if Assigned(FHandler) then
-        begin
-          TInterlocked.Increment(FConsumedCount);
-
-          FHandler(Msg);
-        end;
-      end;
+      FHandler(Msg);
     end;
   finally
     rd_kafka_message_destroy(Msg);
@@ -235,19 +222,28 @@ begin
   TInterlocked.Exchange(Result, FProducedCount);
 end;
 
-function TKafkaProducer.Produce(const Topic: String; const Payload: String; const Key: Pointer; const KeyLen: NativeUInt; const Partition: Int32; const MsgFlags: Integer;
+function TKafkaProducer.Produce(const Topic: String; const Payload: String; const Key: String; const Partition: Int32; const MsgFlags: Integer;
   const MsgOpaque: Pointer): Integer;
+var
+  KTopic: prd_kafka_topic_t;
 begin
-  Result := Produce(
+  KTopic := TKafkaHelper.NewTopic(
+    FKafkaHandle,
     Topic,
-    @Payload[1],
-    length(Payload),
-    Key,
-    KeyLen,
-    Partition,
-    MsgFlags,
-    MsgOpaque
-  );
+    nil);
+  try
+    Result := TKafkaHelper.Produce(
+      KTopic,
+      Partition,
+      MsgFlags,
+      Payload,
+      Key,
+      MsgOpaque);
+
+    TInterlocked.Increment(FProducedCount);
+  finally
+    rd_kafka_topic_destroy(KTopic);
+  end;
 end;
 
 function TKafkaProducer.Produce(const Topic: String; const Payload: Pointer; const PayloadLength: NativeUInt; const Key: Pointer; const KeyLen: NativeUInt;
@@ -302,7 +298,7 @@ begin
   end;
 end;
 
-function TKafkaProducer.Produce(const Topic: String; const Payloads: TArray<String>; const Key: Pointer; const KeyLen: NativeUInt; const Partition: Int32;
+function TKafkaProducer.Produce(const Topic: String; const Payloads: TArray<String>; const Key: String; const Partition: Int32;
   const MsgFlags: Integer; const MsgOpaque: Pointer): Integer;
 var
   KTopic: prd_kafka_topic_t;
@@ -318,7 +314,6 @@ begin
       MsgFlags,
       Payloads,
       Key,
-      KeyLen,
       MsgOpaque);
 
     TInterlocked.Add(FProducedCount, Length(Payloads));

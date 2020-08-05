@@ -54,6 +54,9 @@ type
     Layout4: TLayout;
     Label3: TLabel;
     edtMessage: TEdit;
+    Layout5: TLayout;
+    Label4: TLabel;
+    edtKey: TEdit;
     procedure actProduceMessageExecute(Sender: TObject);
     procedure actStartConsumingExecute(Sender: TObject);
     procedure tmrUpdateTimer(Sender: TObject);
@@ -122,7 +125,17 @@ begin
       procedure(const Msg: prd_kafka_message_t)
       begin
         // This is called from the consumer thread, but TKafka.Log is threadsafe
-        TKafkaHelper.Log(format('Message received - %s', [TKafkaHelper.PointerToStr(Msg.payload, Msg.len)]), TKafkaLogType.kltConsumer);
+        if TKafkaHelper.IsKafkaError(Msg.err) then
+        begin
+          TKafkaHelper.Log(format('Message error - %d', [Integer(Msg.err)]), TKafkaLogType.kltConsumer);
+        end
+        else
+        begin
+          TKafkaHelper.Log(format('[key=%s] - %s', [
+            TKafkaHelper.PointerToStr(Msg.key, Msg.key_len),
+            TKafkaHelper.PointerToStr(Msg.payload, Msg.len)]),
+            TKafkaLogType.kltConsumer);
+        end;
       end);
   end;
 end;
@@ -168,11 +181,10 @@ begin
   FKafkaProducer.Produce(
     edtTopic.Text,
     Msgs,
-    nil,
-    0,
+    edtKey.Text,
     RD_KAFKA_PARTITION_UA,
     RD_KAFKA_MSG_F_COPY,
-    nil);
+    @self);
 
   if chkFlushAfterProduce.IsChecked then
   begin
