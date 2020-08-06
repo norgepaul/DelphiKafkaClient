@@ -68,6 +68,8 @@ type
     procedure edtKafkaServerChange(Sender: TObject);
     procedure edtTopicChange(Sender: TObject);
   private
+    FStringEncoding: TEncoding;
+
     FKafkaProducer: IKafkaProducer;
     FKafkaConsumer: IKafkaConsumer;
 
@@ -116,9 +118,9 @@ begin
   begin
     FKafkaConsumer := TKafkaFactory.NewConsumer(
       ['group.id'],
-      ['GroupID'],
-      ['auto.offset.reset'],
-      ['earliest'],
+      ['1'],
+      ['auto.offset.reset', 'enable.auto.commit'],
+      ['latest', 'false'], // ['earliest'],
       edtKafkaServer.Text,
       [edtTopic.Text],
       [0],
@@ -131,9 +133,10 @@ begin
         end
         else
         begin
-          TKafkaHelper.Log(format('[key=%s] - %s', [
-            TKafkaHelper.PointerToStr(Msg.key, Msg.key_len),
-            TKafkaHelper.PointerToStr(Msg.payload, Msg.len)]),
+          TKafkaHelper.Log(format('[key=%s, partition=%d] - %s', [
+            TKafkaHelper.PointerToStr(Msg.key, Msg.key_len, FStringEncoding),
+            Msg.partition,
+            TKafkaHelper.PointerToStr(Msg.payload, Msg.len, FStringEncoding)]),
             TKafkaLogType.kltConsumer);
         end;
       end);
@@ -182,6 +185,7 @@ begin
     edtTopic.Text,
     Msgs,
     edtKey.Text,
+    FStringEncoding,
     RD_KAFKA_PARTITION_UA,
     RD_KAFKA_MSG_F_COPY,
     @self);
@@ -197,6 +201,8 @@ begin
   inherited;
 
   TKafkaHelper.OnLog := OnLog;
+
+  FStringEncoding := TEncoding.UTF8;
 
   UpdateStatus;
 end;

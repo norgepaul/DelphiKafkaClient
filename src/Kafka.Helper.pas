@@ -47,16 +47,18 @@ type
 
     class function NewTopic(const KafkaHandle: prd_kafka_t; const TopicName: String; const TopicConfiguration: prd_kafka_topic_conf_t = nil): prd_kafka_topic_t;
 
-    class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payload: Pointer; const PayloadLength: NativeUInt; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer = nil): Integer; overload;
-    class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payload: String; const Key: String; const MsgOpaque: Pointer = nil): Integer; overload;
-    class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payloads: TArray<String>; const Key: String; const MsgOpaque: Pointer = nil): Integer; overload;
-    class function Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payloads: TArray<Pointer>; const PayloadLengths: TArray<Integer>; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer = nil): Integer; overload;
+    class function Produce(const Topic: prd_kafka_topic_t; const Payload: Pointer; const PayloadLength: NativeUInt; const Key: Pointer = nil; const KeyLen: NativeUInt = 0; const Partition: Int32 = RD_KAFKA_PARTITION_UA; const MsgFlags: Integer = RD_KAFKA_MSG_F_COPY; const MsgOpaque: Pointer = nil): Integer; overload;
+    class function Produce(const Topic: prd_kafka_topic_t; const Payloads: TArray<Pointer>; const PayloadLengths: TArray<Integer>; const Key: Pointer = nil; const KeyLen: NativeUInt = 0; const Partition: Int32 = RD_KAFKA_PARTITION_UA; const MsgFlags: Integer = RD_KAFKA_MSG_F_COPY; const MsgOpaque: Pointer = nil): Integer; overload;
+    class function Produce(const Topic: prd_kafka_topic_t; const Payload: String; const Key: String; const Partition: Int32 = RD_KAFKA_PARTITION_UA; const MsgFlags: Integer = RD_KAFKA_MSG_F_COPY; const MsgOpaque: Pointer = nil): Integer; overload;
+    class function Produce(const Topic: prd_kafka_topic_t; const Payload: String; const Key: String; const Encoding: TEncoding; const Partition: Int32 = RD_KAFKA_PARTITION_UA; const MsgFlags: Integer = RD_KAFKA_MSG_F_COPY; const MsgOpaque: Pointer = nil): Integer; overload;
+    class function Produce(const Topic: prd_kafka_topic_t; const Payloads: TArray<String>; const Key: String; const Partition: Int32 = RD_KAFKA_PARTITION_UA; const MsgFlags: Integer = RD_KAFKA_MSG_F_COPY; const MsgOpaque: Pointer = nil): Integer; overload;
+    class function Produce(const Topic: prd_kafka_topic_t; const Payloads: TArray<String>; const Key: String; const Encoding: TEncoding; const Partition: Int32 = RD_KAFKA_PARTITION_UA; const MsgFlags: Integer = RD_KAFKA_MSG_F_COPY; const MsgOpaque: Pointer = nil): Integer; overload;
 
     class procedure Flush(const KafkaHandle: prd_kafka_t; const Timeout: Integer = 1000);
 
     // Helpers
-    class function PointerToStr(const Value: Pointer; const Len: Integer): String; static;
-    class function StrToPointer(const Value: String; var Pntr: Pointer; var Len: Integer): String; static;
+    class function PointerToStr(const Value: Pointer; const Len: Integer; const Encoding: TEncoding): String; static;
+    class function StrToBytes(const Value: String; const Encoding: TEncoding): TBytes; static;
     class function IsKafkaError(const Error: rd_kafka_resp_err_t): Boolean; static;
 
     // Internal
@@ -278,8 +280,8 @@ begin
   end;
 end;
 
-class function TKafkaHelper.Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payloads: TArray<Pointer>;
-  const PayloadLengths: TArray<Integer>; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer): Integer;
+class function TKafkaHelper.Produce(const Topic: prd_kafka_topic_t; const Payloads: TArray<Pointer>; const PayloadLengths: TArray<Integer>; const Key: Pointer;
+  const KeyLen: NativeUInt; const Partition: Int32; const MsgFlags: Integer; const MsgOpaque: Pointer): Integer;
 var
   i: Integer;
   Msgs: TArray<rd_kafka_message_t>;
@@ -319,28 +321,75 @@ begin
   end;
 end;
 
-class function TKafkaHelper.Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payload: String;
-  const Key: String; const MsgOpaque: Pointer): Integer;
+class function TKafkaHelper.Produce(const Topic: prd_kafka_topic_t; const Payloads: TArray<String>; const Key: String; const Encoding: TEncoding;
+  const Partition: Int32; const MsgFlags: Integer; const MsgOpaque: Pointer): Integer;
 var
-  PayloadPointer, KeyPointer: Pointer;
-  PayloadLength, KeyLength: Integer;
+  PayloadPointers: TArray<Pointer>;
+  PayloadLengths: TArray<Integer>;
+  KeyBytes, PayloadBytes: TBytes;
+  i: Integer;
+  KeyData: TBytes;
 begin
-  StrToPointer(Payload, PayloadPointer, PayloadLength);
-  StrToPointer(Key, KeyPointer, KeyLength);
+  SetLength(PayloadPointers, length(Payloads));
+  SetLength(PayloadLengths, length(Payloads));
+
+  KeyData := TEncoding.UTF8.GetBytes(Key);
+
+  KeyBytes := StrToBytes(Key, Encoding);
+
+  for i := Low(Payloads) to High(Payloads) do
+  begin
+    PayloadBytes := StrToBytes(Payloads[i], Encoding);
+
+    PayloadPointers[i] := @PayloadBytes[0];
+    PayloadLengths[i] := Length(PayloadBytes);
+  end;
 
   Result := Produce(
     Topic,
+    PayloadPointers,
+    PayloadLengths,
+    @KeyBytes[0],
+    Length(KeyBytes),
     Partition,
     MsgFlags,
-    PayloadPointer,
-    PayloadLength,
-    KeyPointer,
-    KeyLength,
+    MsgOpaque);
+end;
+
+class function TKafkaHelper.Produce(const Topic: prd_kafka_topic_t; const Payload: String; const Key: String; const Encoding: TEncoding;
+  const Partition: Int32; const MsgFlags: Integer; const MsgOpaque: Pointer): Integer;
+var
+  KeyBytes, PayloadBytes: TBytes;
+begin
+  KeyBytes := StrToBytes(Key, TEncoding.UTF8);
+  PayloadBytes := StrToBytes(Payload, TEncoding.UTF8);
+
+  Result := Produce(
+    Topic,
+    @PayloadBytes[0],
+    length(PayloadBytes),
+    @KeyBytes[0],
+    length(KeyBytes),
+    Partition,
+    MsgFlags,
     MsgOpaque)
 end;
 
-class function TKafkaHelper.Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payload: Pointer;
-  const PayloadLength: NativeUInt; const Key: Pointer; const KeyLen: NativeUInt; const MsgOpaque: Pointer): Integer;
+class function TKafkaHelper.Produce(const Topic: prd_kafka_topic_t; const Payload: String; const Key: String; const Partition: Int32;
+  const MsgFlags: Integer; const MsgOpaque: Pointer): Integer;
+begin
+  Result := Produce(
+    Topic,
+    Payload,
+    Key,
+    TEncoding.UTF8,
+    Partition,
+    MsgFlags,
+    MsgOpaque);
+end;
+
+class function TKafkaHelper.Produce(const Topic: prd_kafka_topic_t; const Payload: Pointer; const PayloadLength: NativeUInt;
+  const Key: Pointer; const KeyLen: NativeUInt; const Partition: Int32; const MsgFlags: Integer; const MsgOpaque: Pointer): Integer;
 begin
   Result := rd_kafka_produce(
     Topic,
@@ -403,22 +452,16 @@ begin
   end;
 end;
 
-class function TKafkaHelper.StrToPointer(const Value: String; var Pntr: Pointer; var Len: Integer): String;
-var
-  x: String;
+class function TKafkaHelper.StrToBytes(const Value: String; const Encoding: TEncoding): TBytes;
 begin
   if Value = '' then
   begin
-    Pntr := nil;
-    Len := 0;
+    Result := [];
   end
   else
   begin
-    Pntr := @Value[1];
-    Len := Length(Value) * 2;
+    Result := Encoding.GetBytes(Value);
   end;
-
-  X := PointerToStr(Pntr, Len);
 end;
 
 { TKafkaHelper }
@@ -430,54 +473,26 @@ begin
     (Error <> RD_KAFKA_RESP_ERR__PARTITION_EOF);
 end;
 
-class function TKafkaHelper.PointerToStr(const Value: Pointer; const Len: Integer): String;
+class function TKafkaHelper.PointerToStr(const Value: Pointer; const Len: Integer; const Encoding: TEncoding): String;
 var
-  i: Integer;
+  Data: TBytes;
 begin
-  Result := '';
+  SetLength(Data, Len);
+  Move(Value^, Pointer(Data)^, Len);
 
-  if Value <> nil then
-  begin
-    SetLength(Result, Len div 2);
-
-    for i := 1 to Len div 2 do
-    begin
-      Result[i] := String(Value)[i];
-    end;
-  end;
+  Result := Encoding.GetString(Data);
 end;
 
-class function TKafkaHelper.Produce(const Topic: prd_kafka_topic_t; const Partition: Int32; const MsgFlags: Integer; const Payloads: TArray<String>;
-  const Key: String; const MsgOpaque: Pointer): Integer;
-var
-  PayloadPointers: TArray<Pointer>;
-  PayloadLengths: TArray<Integer>;
-  PayloadPointer, KeyPointer: Pointer;
-  PayloadLength, KeyLength: Integer;
-  i: Integer;
-  TempStr: String;
+class function TKafkaHelper.Produce(const Topic: prd_kafka_topic_t; const Payloads: TArray<String>; const Key: String; const Partition: Int32;
+   const MsgFlags: Integer; const MsgOpaque: Pointer): Integer;
 begin
-  SetLength(PayloadPointers, length(Payloads));
-  SetLength(PayloadLengths, length(Payloads));
-
-  StrToPointer(Key, KeyPointer, KeyLength);
-
-  for i := Low(Payloads) to High(Payloads) do
-  begin
-    StrToPointer(Payloads[i], PayloadPointer, PayloadLength);
-
-    PayloadPointers[i] := PayloadPointer;
-    PayloadLengths[i] := PayloadLength;
-  end;
-
   Result := Produce(
     Topic,
+    Payloads,
+    Key,
+    TEncoding.UTF8,
     Partition,
     MsgFlags,
-    PayloadPointers,
-    PayloadLengths,
-    KeyPointer,
-    KeyLength,
     MsgOpaque);
 end;
 
