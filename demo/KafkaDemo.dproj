@@ -264,6 +264,8 @@
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -287,7 +289,7 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="frmMain.pas">
+        <DCCReference Include="Kafka.FMX.Form.Main.pas">
             <Form>frmKafkaDemo</Form>
             <FormType>fmx</FormType>
         </DCCReference>
@@ -297,6 +299,14 @@
         <DCCReference Include="..\src\Kafka.Interfaces.pas"/>
         <DCCReference Include="..\src\Kafka.Factory.pas"/>
         <DCCReference Include="..\src\Kafka.Helper.pas"/>
+        <DCCReference Include="Kafka.FMX.Form.Producer.pas">
+            <Form>frmProducer</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
+        <DCCReference Include="Kafka.FMX.Form.Consumer.pas">
+            <Form>frmConsumer</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -317,6 +327,10 @@
                 <Source>
                     <Source Name="MainSource">KafkaDemo.dpr</Source>
                 </Source>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k270.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp270.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
             </Delphi.Personality>
             <Platforms>
                 <Platform value="Android">False</Platform>

@@ -56,10 +56,12 @@ type
 
     class procedure Flush(const KafkaHandle: prd_kafka_t; const Timeout: Integer = 1000);
 
-    // Helpers
+    // Utils
     class function PointerToStr(const Value: Pointer; const Len: Integer; const Encoding: TEncoding): String; static;
+    class function PointerToBytes(const Value: Pointer; const Len: Integer): TBytes; static;
     class function StrToBytes(const Value: String; const Encoding: TEncoding): TBytes; static;
     class function IsKafkaError(const Error: rd_kafka_resp_err_t): Boolean; static;
+    class procedure StringsToConfigArrays(const Values: TStrings; out NameArr, ValueArr: TArray<String>);
 
     // Internal
     class procedure FlushLogs;
@@ -452,6 +454,24 @@ begin
   end;
 end;
 
+class procedure TKafkaHelper.StringsToConfigArrays(const Values: TStrings; out NameArr, ValueArr: TArray<String>);
+var
+  i: Integer;
+  Name, Value: String;
+  KeyValue: TArray<String>;
+begin
+  for i := 0 to pred(Values.Count) do
+  begin
+    if pos('=', Values[i]) <> 0 then
+    begin
+      KeyValue := Values[i].Split(['='], 2);
+
+      NameArr := NameArr + [KeyValue[0]];
+      ValueArr := ValueArr + [KeyValue[1]];
+    end;
+  end;
+end;
+
 class function TKafkaHelper.StrToBytes(const Value: String; const Encoding: TEncoding): TBytes;
 begin
   if Value = '' then
@@ -481,6 +501,14 @@ begin
   Move(Value^, Pointer(Data)^, Len);
 
   Result := Encoding.GetString(Data);
+end;
+
+class function TKafkaHelper.PointerToBytes(const Value: Pointer; const Len: Integer): TBytes;
+var
+  Data: TBytes;
+begin
+  SetLength(Result, Len);
+  Move(Value^, Pointer(Result)^, Len);
 end;
 
 class function TKafkaHelper.Produce(const Topic: prd_kafka_topic_t; const Payloads: TArray<String>; const Key: String; const Partition: Int32;

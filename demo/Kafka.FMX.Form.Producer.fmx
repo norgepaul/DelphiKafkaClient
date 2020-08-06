@@ -1,0 +1,178 @@
+object frmProduce: TfrmProduce
+  Left = 0
+  Top = 0
+  Caption = 'Kafka Producer'
+  ClientHeight = 177
+  ClientWidth = 600
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnClose = FormClose
+  DesignerMasterStyle = 0
+  object lblStatus: TLabel
+    Align = MostBottom
+    Position.Y = 160.000000000000000000
+    Size.Width = 600.000000000000000000
+    Size.Height = 17.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Idle'
+  end
+  object Layout1: TLayout
+    Align = Top
+    Margins.Bottom = 3.000000000000000000
+    Size.Width = 600.000000000000000000
+    Size.Height = 24.000000000000000000
+    Size.PlatformDefault = False
+    object Layout2: TLayout
+      Align = Left
+      Size.Width = 135.000000000000000000
+      Size.Height = 24.000000000000000000
+      Size.PlatformDefault = False
+      object Label2: TLabel
+        Align = MostLeft
+        AutoSize = True
+        Margins.Right = 3.000000000000000000
+        Size.Width = 42.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Trailing
+        Text = 'Topic'
+      end
+      object edtTopic: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Client
+        Text = 'test'
+        Size.Width = 90.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+      end
+    end
+    object Layout4: TLayout
+      Align = Client
+      Size.Width = 329.000000000000000000
+      Size.Height = 24.000000000000000000
+      Size.PlatformDefault = False
+      object Label3: TLabel
+        Align = MostLeft
+        AutoSize = True
+        Margins.Right = 3.000000000000000000
+        Size.Width = 57.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Trailing
+        Text = 'Message'
+      end
+      object edtMessage: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Client
+        Text = 'Test message '#248#230#229' - '#20320#22909
+        Size.Width = 269.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+      end
+    end
+    object Layout5: TLayout
+      Align = Left
+      Margins.Right = 10.000000000000000000
+      Position.X = 135.000000000000000000
+      Size.Width = 126.000000000000000000
+      Size.Height = 24.000000000000000000
+      Size.PlatformDefault = False
+      object Label4: TLabel
+        Align = MostLeft
+        AutoSize = True
+        Margins.Right = 3.000000000000000000
+        Size.Width = 39.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Trailing
+        Text = 'Key'
+      end
+      object edtKey: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Client
+        Text = 'key'
+        Size.Width = 84.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+      end
+    end
+  end
+  object Layout3: TLayout
+    Align = Bottom
+    Margins.Top = 3.000000000000000000
+    Margins.Bottom = 3.000000000000000000
+    Position.Y = 132.000000000000000000
+    Size.Width = 600.000000000000000000
+    Size.Height = 25.000000000000000000
+    Size.PlatformDefault = False
+    object edtMessageCount: TSpinBox
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Align = Left
+      Cursor = crIBeam
+      Min = 1.000000000000000000
+      Max = 10000000.000000000000000000
+      Value = 5.000000000000000000
+      Position.X = 2.000000000000000000
+      Margins.Left = 2.000000000000000000
+      Size.Width = 135.000000000000000000
+      Size.Height = 25.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object Button1: TButton
+      Align = Client
+      Margins.Left = 3.000000000000000000
+      Margins.Right = 3.000000000000000000
+      Size.Width = 158.000000000000000000
+      Size.Height = 25.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Produce'
+      OnClick = Button1Click
+    end
+    object Button4: TButton
+      Align = Right
+      Margins.Left = 3.000000000000000000
+      Position.X = 304.000000000000000000
+      Size.Width = 156.000000000000000000
+      Size.Height = 25.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Flush'
+      OnClick = Button4Click
+    end
+    object chkFlushAfterProduce: TCheckBox
+      Align = Right
+      IsChecked = True
+      Margins.Left = 3.000000000000000000
+      Position.X = 463.000000000000000000
+      Size.Width = 137.000000000000000000
+      Size.Height = 25.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Flush after Produce'
+    end
+  end
+  object memConfig: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    StyledSettings = [Style, FontColor]
+    TextSettings.Font.Family = 'Consolas'
+    TextSettings.Font.Size = 14.000000000000000000
+    OnChange = memConfigChange
+    Align = Client
+    Size.Width = 600.000000000000000000
+    Size.Height = 102.000000000000000000
+    Size.PlatformDefault = False
+    Viewport.Width = 600.000000000000000000
+    Viewport.Height = 102.000000000000000000
+  end
+  object tmrUpdate: TTimer
+    Interval = 200
+    OnTimer = tmrUpdateTimer
+    Left = 104
+    Top = 40
+  end
+  object ActionList1: TActionList
+    OnExecute = ActionList1Execute
+    Left = 24
+    Top = 40
+  end
+end

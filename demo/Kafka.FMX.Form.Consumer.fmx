@@ -1,0 +1,176 @@
+object frmConsume: TfrmConsume
+  Left = 0
+  Top = 0
+  Caption = 'Kafka Consumer'
+  ClientHeight = 767
+  ClientWidth = 600
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object layConsumeControl: TLayout
+    Align = Top
+    Margins.Bottom = 3.000000000000000000
+    Position.Y = 181.000000000000000000
+    Size.Width = 600.000000000000000000
+    Size.Height = 25.000000000000000000
+    Size.PlatformDefault = False
+    OnResize = layConsumeControlResize
+    object btnStart: TButton
+      Align = MostLeft
+      Margins.Right = 2.000000000000000000
+      Size.Width = 241.000000000000000000
+      Size.Height = 25.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Start'
+      OnClick = btnStartClick
+    end
+    object btnStop: TButton
+      Align = Client
+      Enabled = False
+      Margins.Left = 2.000000000000000000
+      Size.Width = 355.000000000000000000
+      Size.Height = 25.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Stop'
+      OnClick = btnStopClick
+    end
+  end
+  object Layout1: TLayout
+    Align = Top
+    Margins.Bottom = 3.000000000000000000
+    Size.Width = 600.000000000000000000
+    Size.Height = 24.000000000000000000
+    Size.PlatformDefault = False
+    object Layout2: TLayout
+      Align = Left
+      Size.Width = 135.000000000000000000
+      Size.Height = 24.000000000000000000
+      Size.PlatformDefault = False
+      object Label2: TLabel
+        Align = MostLeft
+        AutoSize = True
+        Margins.Right = 3.000000000000000000
+        Size.Width = 42.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Trailing
+        Text = 'Topic'
+      end
+      object edtTopic: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Client
+        Text = 'test'
+        Size.Width = 90.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+      end
+    end
+  end
+  object lblStatus: TLabel
+    Align = MostBottom
+    Position.Y = 750.000000000000000000
+    Size.Width = 600.000000000000000000
+    Size.Height = 17.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Idle'
+  end
+  object Layout3: TLayout
+    Align = Top
+    Padding.Bottom = 3.000000000000000000
+    Position.Y = 27.000000000000000000
+    Size.Width = 600.000000000000000000
+    Size.Height = 154.000000000000000000
+    Size.PlatformDefault = False
+    object layKafkaConfiguration: TLayout
+      Align = Left
+      Padding.Right = 2.000000000000000000
+      Size.Width = 241.000000000000000000
+      Size.Height = 151.000000000000000000
+      Size.PlatformDefault = False
+      object Label1: TLabel
+        Align = Top
+        Size.Width = 239.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Kafka Configuration'
+      end
+      object memKafkaConfig: TMemo
+        Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+        DataDetectorTypes = []
+        Lines.Strings = (
+          'group.id=1')
+        StyledSettings = [Style, FontColor]
+        TextSettings.Font.Family = 'Consolas'
+        TextSettings.Font.Size = 14.000000000000000000
+        Align = Client
+        Size.Width = 239.000000000000000000
+        Size.Height = 134.000000000000000000
+        Size.PlatformDefault = False
+        Viewport.Width = 235.000000000000000000
+        Viewport.Height = 130.000000000000000000
+      end
+    end
+    object Layout5: TLayout
+      Align = Client
+      Margins.Left = 2.000000000000000000
+      Size.Width = 357.000000000000000000
+      Size.Height = 151.000000000000000000
+      Size.PlatformDefault = False
+      object Label3: TLabel
+        Align = Top
+        Size.Width = 357.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Kafka Configuration'
+      end
+      object memTopicConfig: TMemo
+        Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+        DataDetectorTypes = []
+        Lines.Strings = (
+          'auto.offset.reset=latest'
+          'enable.auto.commit=false')
+        StyledSettings = [Style, FontColor]
+        TextSettings.Font.Family = 'Consolas'
+        TextSettings.Font.Size = 14.000000000000000000
+        Align = Client
+        Size.Width = 357.000000000000000000
+        Size.Height = 134.000000000000000000
+        Size.PlatformDefault = False
+        Viewport.Width = 353.000000000000000000
+        Viewport.Height = 130.000000000000000000
+      end
+    end
+  end
+  object grdMessages: TGrid
+    Align = Client
+    CanFocus = True
+    ClipChildren = True
+    Size.Width = 600.000000000000000000
+    Size.Height = 541.000000000000000000
+    Size.PlatformDefault = False
+    RowCount = 0
+    Options = [ColumnResize, ColumnMove, ColLines, RowLines, RowSelect, AlwaysShowSelection, Tabs, Header, HeaderClick, AutoDisplacement]
+    OnGetValue = grdMessagesGetValue
+    OnResize = grdMessagesResize
+    Viewport.Width = 596.000000000000000000
+    Viewport.Height = 516.000000000000000000
+    object colPartition: TStringColumn
+      Header = 'Partition'
+      Size.Width = 81.000000000000000000
+    end
+    object colKey: TStringColumn
+      Header = 'Key'
+    end
+    object colPayload: TStringColumn
+      Header = 'Payload'
+      Size.Width = 386.000000000000000000
+    end
+  end
+  object tmrUpdate: TTimer
+    Interval = 200
+    OnTimer = tmrUpdateTimer
+    Left = 24
+    Top = 120
+  end
+end

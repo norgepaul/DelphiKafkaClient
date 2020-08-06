@@ -19,7 +19,7 @@ object frmKafkaDemo: TfrmKafkaDemo
   object GridPanelLayout1: TGridPanelLayout
     Align = Client
     Size.Width = 1701.000000000000000000
-    Size.Height = 865.000000000000000000
+    Size.Height = 835.000000000000000000
     Size.PlatformDefault = False
     ColumnCollection = <
       item
@@ -38,13 +38,13 @@ object frmKafkaDemo: TfrmKafkaDemo
         Row = 0
       end
       item
-        Column = 0
-        Control = GroupBox1
+        Column = 2
+        Control = Options
         Row = 0
       end
       item
-        Column = 2
-        Control = Options
+        Column = 0
+        Control = GroupBox1
         Row = 0
       end>
     RowCollection = <
@@ -61,38 +61,9 @@ object frmKafkaDemo: TfrmKafkaDemo
       Padding.Right = 10.000000000000000000
       Padding.Bottom = 10.000000000000000000
       Size.Width = 566.994812011718800000
-      Size.Height = 865.000000000000000000
+      Size.Height = 835.000000000000000000
       Size.PlatformDefault = False
-      Text = 'Consume'
-      object layConsumeControl: TLayout
-        Align = Top
-        Margins.Bottom = 3.000000000000000000
-        Position.X = 10.000000000000000000
-        Position.Y = 18.000000000000000000
-        Size.Width = 546.994812011718800000
-        Size.Height = 25.000000000000000000
-        Size.PlatformDefault = False
-        OnResize = layConsumeControlResize
-        object btnConsumingStart: TButton
-          Action = actStartConsuming
-          Align = MostLeft
-          Enabled = True
-          ImageIndex = -1
-          Size.Width = 169.000000000000000000
-          Size.Height = 25.000000000000000000
-          Size.PlatformDefault = False
-        end
-        object Button3: TButton
-          Action = actStopConsuming
-          Align = Client
-          Enabled = False
-          ImageIndex = -1
-          Margins.Left = 3.000000000000000000
-          Size.Width = 374.994812011718800000
-          Size.Height = 25.000000000000000000
-          Size.PlatformDefault = False
-        end
-      end
+      Text = 'Consumer Log'
       object memLogConsumer: TMemo
         Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
         DataDetectorTypes = []
@@ -102,112 +73,10 @@ object frmKafkaDemo: TfrmKafkaDemo
         TextSettings.Font.Size = 14.000000000000000000
         Align = Client
         Size.Width = 546.994812011718800000
-        Size.Height = 787.000000000000000000
+        Size.Height = 807.000000000000000000
         Size.PlatformDefault = False
         Viewport.Width = 543.000000000000000000
-        Viewport.Height = 783.000000000000000000
-      end
-      object chkLogConsumeCallbacks: TCheckBox
-        Align = Top
-        IsChecked = True
-        Margins.Bottom = 3.000000000000000000
-        Position.X = 10.000000000000000000
-        Position.Y = 46.000000000000000000
-        Size.Width = 546.994812011718800000
-        Size.Height = 19.000000000000000000
-        Size.PlatformDefault = False
-        Text = 'Log'
-      end
-    end
-    object GroupBox1: TGroupBox
-      Align = Client
-      Padding.Left = 10.000000000000000000
-      Padding.Top = 18.000000000000000000
-      Padding.Right = 10.000000000000000000
-      Padding.Bottom = 10.000000000000000000
-      Size.Width = 569.849426269531300000
-      Size.Height = 865.000000000000000000
-      Size.PlatformDefault = False
-      Text = 'Produce'
-      object Layout3: TLayout
-        Align = Top
-        Margins.Top = 3.000000000000000000
-        Margins.Bottom = 3.000000000000000000
-        Position.X = 10.000000000000000000
-        Position.Y = 21.000000000000000000
-        Size.Width = 549.849426269531300000
-        Size.Height = 25.000000000000000000
-        Size.PlatformDefault = False
-        object edtMessageCount: TSpinBox
-          Touch.InteractiveGestures = [LongTap, DoubleTap]
-          Align = MostRight
-          Cursor = crIBeam
-          Min = 1.000000000000000000
-          Max = 10000000.000000000000000000
-          Value = 5.000000000000000000
-          Position.X = 452.849426269531300000
-          Margins.Left = 2.000000000000000000
-          Size.Width = 97.000000000000000000
-          Size.Height = 25.000000000000000000
-          Size.PlatformDefault = False
-        end
-        object Button1: TButton
-          Action = actProduceMessage
-          Align = Client
-          Enabled = True
-          ImageIndex = -1
-          Size.Width = 450.849426269531300000
-          Size.Height = 25.000000000000000000
-          Size.PlatformDefault = False
-        end
-      end
-      object Button4: TButton
-        Action = actFlush
-        Align = Top
-        Enabled = False
-        ImageIndex = -1
-        Margins.Bottom = 3.000000000000000000
-        Position.X = 10.000000000000000000
-        Position.Y = 49.000000000000000000
-        Size.Width = 549.849426269531300000
-        Size.Height = 25.000000000000000000
-        Size.PlatformDefault = False
-      end
-      object chkFlushAfterProduce: TCheckBox
-        Align = Top
-        IsChecked = True
-        Margins.Bottom = 3.000000000000000000
-        Position.X = 10.000000000000000000
-        Position.Y = 77.000000000000000000
-        Size.Width = 549.849426269531300000
-        Size.Height = 19.000000000000000000
-        Size.PlatformDefault = False
-        Text = 'Flush after Produce'
-      end
-      object memLogProducer: TMemo
-        Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
-        DataDetectorTypes = []
-        ReadOnly = True
-        StyledSettings = [Style, FontColor]
-        TextSettings.Font.Family = 'Consolas'
-        TextSettings.Font.Size = 14.000000000000000000
-        Align = Client
-        Size.Width = 549.849426269531300000
-        Size.Height = 734.000000000000000000
-        Size.PlatformDefault = False
-        Viewport.Width = 545.800000000000000000
-        Viewport.Height = 730.000000000000000000
-      end
-      object chkLogProduceCallbacks: TCheckBox
-        Align = Top
-        IsChecked = True
-        Margins.Bottom = 3.000000000000000000
-        Position.X = 10.000000000000000000
-        Position.Y = 99.000000000000000000
-        Size.Width = 549.849426269531300000
-        Size.Height = 19.000000000000000000
-        Size.PlatformDefault = False
-        Text = 'Log'
+        Viewport.Height = 803.000000000000000000
       end
     end
     object Options: TGroupBox
@@ -217,9 +86,9 @@ object frmKafkaDemo: TfrmKafkaDemo
       Padding.Right = 10.000000000000000000
       Padding.Bottom = 10.000000000000000000
       Size.Width = 564.155761718750000000
-      Size.Height = 865.000000000000000000
+      Size.Height = 835.000000000000000000
       Size.PlatformDefault = False
-      Text = 'Status'
+      Text = 'Kafka Log'
       object memLogOther: TMemo
         Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
         DataDetectorTypes = []
@@ -232,20 +101,35 @@ object frmKafkaDemo: TfrmKafkaDemo
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 3.000000000000000000
         Size.Width = 541.155761718750000000
-        Size.Height = 811.000000000000000000
+        Size.Height = 801.000000000000000000
         Size.PlatformDefault = False
         Viewport.Width = 537.200000000000000000
-        Viewport.Height = 807.000000000000000000
+        Viewport.Height = 797.000000000000000000
       end
-      object lblStatus: TLabel
-        Align = Top
-        Margins.Bottom = 3.000000000000000000
-        Position.X = 10.000000000000000000
-        Position.Y = 18.000000000000000000
-        Size.Width = 544.155761718750000000
-        Size.Height = 17.000000000000000000
+    end
+    object GroupBox1: TGroupBox
+      Align = Client
+      Padding.Left = 10.000000000000000000
+      Padding.Top = 18.000000000000000000
+      Padding.Right = 10.000000000000000000
+      Padding.Bottom = 10.000000000000000000
+      Size.Width = 569.849426269531300000
+      Size.Height = 835.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Producer Log'
+      object memLogProducer: TMemo
+        Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+        DataDetectorTypes = []
+        ReadOnly = True
+        StyledSettings = [Style, FontColor]
+        TextSettings.Font.Family = 'Consolas'
+        TextSettings.Font.Size = 14.000000000000000000
+        Align = Client
+        Size.Width = 549.849426269531300000
+        Size.Height = 807.000000000000000000
         Size.PlatformDefault = False
-        Text = '-'
+        Viewport.Width = 545.800000000000000000
+        Viewport.Height = 803.000000000000000000
       end
     end
   end
@@ -369,27 +253,55 @@ object frmKafkaDemo: TfrmKafkaDemo
       end
     end
   end
+  object Layout3: TLayout
+    Align = Top
+    Position.Y = 53.000000000000000000
+    Size.Width = 1701.000000000000000000
+    Size.Height = 30.000000000000000000
+    Size.PlatformDefault = False
+    object Button1: TButton
+      Action = actNewProducer
+      Align = Left
+      Enabled = True
+      ImageIndex = -1
+      Margins.Right = 5.000000000000000000
+      Size.Width = 169.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object chkLog: TCheckBox
+      Align = Left
+      IsChecked = True
+      Margins.Bottom = 3.000000000000000000
+      Position.X = 348.000000000000000000
+      Size.Width = 100.000000000000000000
+      Size.Height = 27.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Log'
+    end
+    object Button2: TButton
+      Action = actNewConsumer
+      Align = Left
+      Enabled = True
+      ImageIndex = -1
+      Margins.Right = 5.000000000000000000
+      Position.X = 174.000000000000000000
+      Size.Width = 169.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+    end
+  end
   object ActionList1: TActionList
     OnUpdate = ActionList1Update
     Left = 24
     Top = 440
-    object actProduceMessage: TAction
-      Text = 'Produce Messages'
-      OnExecute = actProduceMessageExecute
+    object actNewProducer: TAction
+      Text = 'New Producer'
+      OnExecute = actNewProducerExecute
     end
-    object actStartConsuming: TAction
-      Text = 'Start Consuming'
-      OnExecute = actStartConsumingExecute
-    end
-    object actStopConsuming: TAction
-      Text = 'Stop Consuming'
-      Enabled = False
-      OnExecute = actStopConsumingExecute
-    end
-    object actFlush: TAction
-      Text = 'Flush Now'
-      Enabled = False
-      OnExecute = actFlushExecute
+    object actNewConsumer: TAction
+      Text = 'New Consumer'
+      OnExecute = actNewConsumerExecute
     end
   end
 end
