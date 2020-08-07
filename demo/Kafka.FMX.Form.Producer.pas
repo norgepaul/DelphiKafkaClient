@@ -37,6 +37,9 @@ type
     chkFlushAfterProduce: TCheckBox;
     memConfig: TMemo;
     ActionList1: TActionList;
+    Layout6: TLayout;
+    Label1: TLabel;
+    edtPartition: TSpinBox;
     procedure ActionList1Execute(Action: TBasicAction; var Handled: Boolean);
     procedure tmrUpdateTimer(Sender: TObject);
     procedure memConfigChange(Sender: TObject);
@@ -119,9 +122,8 @@ begin
     Msgs,
     edtKey.Text,
     FStringEncoding,
-    RD_KAFKA_PARTITION_UA,
-    RD_KAFKA_MSG_F_COPY,
-    @self);
+    Trunc(edtPartition.Value),
+    RD_KAFKA_MSG_F_COPY);
 
   if chkFlushAfterProduce.IsChecked then
   begin
@@ -172,7 +174,7 @@ var
 begin
   if FKafkaProducer = nil then
   begin
-    TKafkaHelper.StringsToConfigArrays(memConfig.Lines, Names, Values);
+    TKafkaUtils.StringsToConfigArrays(memConfig.Lines, Names, Values);
 
     FKafkaProducer := TKafkaFactory.NewProducer(
       Names,
@@ -198,7 +200,7 @@ begin
     ProducedStr := FKafkaProducer.ProducedCount.ToString;
   end;
 
-  lblStatus.Text := ProducedStr;
+  lblStatus.Text := 'Produced: ' + ProducedStr;
 end;
 
 end.

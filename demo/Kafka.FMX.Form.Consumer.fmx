@@ -1,18 +1,25 @@
 object frmConsume: TfrmConsume
   Left = 0
   Top = 0
+  BorderIcons = [biSystemMenu]
   Caption = 'Kafka Consumer'
-  ClientHeight = 767
+  ClientHeight = 430
   ClientWidth = 600
+  Padding.Left = 3.000000000000000000
+  Padding.Top = 3.000000000000000000
+  Padding.Right = 3.000000000000000000
+  Padding.Bottom = 3.000000000000000000
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
+  OnClose = FormClose
   DesignerMasterStyle = 0
   object layConsumeControl: TLayout
-    Align = Top
+    Align = Bottom
     Margins.Bottom = 3.000000000000000000
-    Position.Y = 181.000000000000000000
-    Size.Width = 600.000000000000000000
+    Position.X = 3.000000000000000000
+    Position.Y = 382.000000000000000000
+    Size.Width = 594.000000000000000000
     Size.Height = 25.000000000000000000
     Size.PlatformDefault = False
     OnResize = layConsumeControlResize
@@ -29,7 +36,7 @@ object frmConsume: TfrmConsume
       Align = Client
       Enabled = False
       Margins.Left = 2.000000000000000000
-      Size.Width = 355.000000000000000000
+      Size.Width = 349.000000000000000000
       Size.Height = 25.000000000000000000
       Size.PlatformDefault = False
       Text = 'Stop'
@@ -39,7 +46,9 @@ object frmConsume: TfrmConsume
   object Layout1: TLayout
     Align = Top
     Margins.Bottom = 3.000000000000000000
-    Size.Width = 600.000000000000000000
+    Position.X = 3.000000000000000000
+    Position.Y = 3.000000000000000000
+    Size.Width = 594.000000000000000000
     Size.Height = 24.000000000000000000
     Size.PlatformDefault = False
     object Layout2: TLayout
@@ -66,11 +75,37 @@ object frmConsume: TfrmConsume
         Size.PlatformDefault = False
       end
     end
+    object Layout4: TLayout
+      Align = Left
+      Position.X = 135.000000000000000000
+      Size.Width = 178.000000000000000000
+      Size.Height = 24.000000000000000000
+      Size.PlatformDefault = False
+      object Label4: TLabel
+        Align = MostLeft
+        AutoSize = True
+        Margins.Right = 3.000000000000000000
+        Size.Width = 81.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Trailing
+        Text = 'Partitions'
+      end
+      object edtPartitions: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Client
+        Text = '0'
+        Size.Width = 94.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+      end
+    end
   end
   object lblStatus: TLabel
     Align = MostBottom
-    Position.Y = 750.000000000000000000
-    Size.Width = 600.000000000000000000
+    Position.X = 3.000000000000000000
+    Position.Y = 410.000000000000000000
+    Size.Width = 594.000000000000000000
     Size.Height = 17.000000000000000000
     Size.PlatformDefault = False
     Text = 'Idle'
@@ -78,8 +113,10 @@ object frmConsume: TfrmConsume
   object Layout3: TLayout
     Align = Top
     Padding.Bottom = 3.000000000000000000
-    Position.Y = 27.000000000000000000
-    Size.Width = 600.000000000000000000
+    Margins.Bottom = 3.000000000000000000
+    Position.X = 3.000000000000000000
+    Position.Y = 30.000000000000000000
+    Size.Width = 594.000000000000000000
     Size.Height = 154.000000000000000000
     Size.PlatformDefault = False
     object layKafkaConfiguration: TLayout
@@ -114,30 +151,30 @@ object frmConsume: TfrmConsume
     object Layout5: TLayout
       Align = Client
       Margins.Left = 2.000000000000000000
-      Size.Width = 357.000000000000000000
+      Size.Width = 351.000000000000000000
       Size.Height = 151.000000000000000000
       Size.PlatformDefault = False
       object Label3: TLabel
         Align = Top
-        Size.Width = 357.000000000000000000
+        Size.Width = 351.000000000000000000
         Size.Height = 17.000000000000000000
         Size.PlatformDefault = False
-        Text = 'Kafka Configuration'
+        Text = 'Topic Configuration'
       end
       object memTopicConfig: TMemo
         Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
         DataDetectorTypes = []
         Lines.Strings = (
           'auto.offset.reset=latest'
-          'enable.auto.commit=false')
+          'enable.auto.commit=true')
         StyledSettings = [Style, FontColor]
         TextSettings.Font.Family = 'Consolas'
         TextSettings.Font.Size = 14.000000000000000000
         Align = Client
-        Size.Width = 357.000000000000000000
+        Size.Width = 351.000000000000000000
         Size.Height = 134.000000000000000000
         Size.PlatformDefault = False
-        Viewport.Width = 353.000000000000000000
+        Viewport.Width = 347.000000000000000000
         Viewport.Height = 130.000000000000000000
       end
     end
@@ -146,15 +183,16 @@ object frmConsume: TfrmConsume
     Align = Client
     CanFocus = True
     ClipChildren = True
-    Size.Width = 600.000000000000000000
-    Size.Height = 541.000000000000000000
+    Margins.Bottom = 3.000000000000000000
+    Size.Width = 594.000000000000000000
+    Size.Height = 192.000000000000000000
     Size.PlatformDefault = False
     RowCount = 0
     Options = [ColumnResize, ColumnMove, ColLines, RowLines, RowSelect, AlwaysShowSelection, Tabs, Header, HeaderClick, AutoDisplacement]
     OnGetValue = grdMessagesGetValue
     OnResize = grdMessagesResize
-    Viewport.Width = 596.000000000000000000
-    Viewport.Height = 516.000000000000000000
+    Viewport.Width = 590.000000000000000000
+    Viewport.Height = 167.000000000000000000
     object colPartition: TStringColumn
       Header = 'Partition'
       Size.Width = 81.000000000000000000

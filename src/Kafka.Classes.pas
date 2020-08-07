@@ -103,6 +103,11 @@ procedure TKafkaConsumerThread.DoCleanUp;
 begin
   if FKafkaHandle <> nil then
   begin
+    (*rd_kafka_commit(
+      FKafkaHandle,
+      Msg,
+      1);*)
+
     TKafkaHelper.ConsumerClose(FKafkaHandle);
     TKafkaHelper.DestroyHandle(FKafkaHandle);
   end;
@@ -121,7 +126,19 @@ begin
     begin
       TInterlocked.Increment(FConsumedCount);
 
-      FHandler(Msg);
+      try
+        FHandler(Msg);
+
+        (*rd_kafka_commit_message(
+          FKafkaHandle,
+          Msg,
+          0);*)
+      except
+        on e: Exception do
+        begin
+          TKafkaHelper.Log('Exception in message callback - ' + e.Message, TKafkaLogType.kltError);
+        end;
+      end;
     end;
   finally
     rd_kafka_message_destroy(Msg);

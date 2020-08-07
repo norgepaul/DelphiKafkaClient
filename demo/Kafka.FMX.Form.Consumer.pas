@@ -4,16 +4,19 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  System.Generics.Collections,
+  System.Generics.Collections,System.Rtti,
 
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Memo.Types,
   FMX.Edit, FMX.StdCtrls, FMX.ScrollBox, FMX.Memo, FMX.Controls.Presentation, FMX.Layouts,
+  FMX.Grid.Style, FMX.Grid,
 
   Kafka.Lib,
   Kafka.Factory,
   Kafka.Interfaces,
   Kafka.Helper,
-  Kafka.Types, System.Rtti, FMX.Grid.Style, FMX.Grid;
+  Kafka.Types,
+
+  Kafka.FMX.Helper;
 
 type
   TKafkaMsg = record
@@ -43,12 +46,16 @@ type
     colPartition: TStringColumn;
     colKey: TStringColumn;
     colPayload: TStringColumn;
+    Layout4: TLayout;
+    Label4: TLabel;
+    edtPartitions: TEdit;
     procedure btnStartClick(Sender: TObject);
     procedure btnStopClick(Sender: TObject);
     procedure layConsumeControlResize(Sender: TObject);
     procedure tmrUpdateTimer(Sender: TObject);
     procedure grdMessagesGetValue(Sender: TObject; const ACol, ARow: Integer; var Value: TValue);
     procedure grdMessagesResize(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FKafkaConsumer: IKafkaConsumer;
     FKafkaServers: String;
@@ -110,6 +117,11 @@ begin
   Show;
 end;
 
+procedure TfrmConsume.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := TCloseAction.caFree;
+end;
+
 procedure TfrmConsume.grdMessagesGetValue(Sender: TObject; const ACol, ARow: Integer; var Value: TValue);
 begin
   case ACol of
@@ -140,8 +152,8 @@ var
 begin
   if FKafkaConsumer = nil then
   begin
-    TKafkaHelper.StringsToConfigArrays(memKafkaConfig.Lines, KafkaNames, KafkaValues);
-    TKafkaHelper.StringsToConfigArrays(memTopicConfig.Lines, TopicNames, TopicValues);
+    TKafkaUtils.StringsToConfigArrays(memKafkaConfig.Lines, KafkaNames, KafkaValues);
+    TKafkaUtils.StringsToConfigArrays(memTopicConfig.Lines, TopicNames, TopicValues);
 
     FKafkaConsumer := TKafkaFactory.NewConsumer(
       KafkaNames,
@@ -150,7 +162,7 @@ begin
       TopicValues,
       FKafkaServers,
       [edtTopic.Text],
-      [0],
+      TKafkaUtils.StringsToIntegerArray(edtPartitions.Text),
       procedure(const Msg: prd_kafka_message_t)
       begin
         TThread.Synchronize(
@@ -159,17 +171,23 @@ begin
           var
             MsgRec: TKafkaMsg;
           begin
+            MsgRec.Key := TKafkaUtils.PointerToBytes(Msg.key, Msg.key_len);
+            MsgRec.Partition := Msg.partition;
+
             if TKafkaHelper.IsKafkaError(Msg.err) then
             begin
-              Log(format('Message error - %d', [Integer(Msg.err)]));
+              MsgRec.Data := TEncoding.ASCII.GetBytes('ERROR - ' + Integer(Msg.err).ToString);
             end
             else
             begin
-              MsgRec.Key := TKafkaHelper.PointerToBytes(Msg.key, Msg.key_len);
-              MsgRec.Data := TKafkaHelper.PointerToBytes(Msg.payload, Msg.len);
-              MsgRec.Partition := Msg.partition;
+              MsgRec.Data := TKafkaUtils.PointerToBytes(Msg.payload, Msg.len);
+            end;
 
-              FMsgs.Add(MsgRec);
+            FMsgs.Add(MsgRec);
+
+            while FMsgs.Count > TFMXHelper.MAX_LOG_LINES do
+            begin
+              FMsgs.Delete(0);
             end;
           end);
       end);
@@ -207,16 +225,9 @@ begin
   memKafkaConfig.Enabled := FKafkaConsumer = nil;
   memTopicConfig.Enabled := FKafkaConsumer = nil;
   edtTopic.Enabled := FKafkaConsumer = nil;
+  edtPartitions.Enabled := FKafkaConsumer = nil;
 
-  if grdMessages.RowCount <> FMsgs.Count then
-  begin
-    grdMessages.BeginUpdate;
-    try
-      grdMessages.RowCount := FMsgs.Count;
-    finally
-      grdMessages.EndUpdate;
-    end;
-  end;
+  TFMXHelper.SetGridRowCount(grdMessages, FMsgs.Count);
 end;
 
 end.

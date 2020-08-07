@@ -1,9 +1,14 @@
 object frmProduce: TfrmProduce
   Left = 0
   Top = 0
+  BorderIcons = [biSystemMenu]
   Caption = 'Kafka Producer'
-  ClientHeight = 177
+  ClientHeight = 170
   ClientWidth = 600
+  Padding.Left = 3.000000000000000000
+  Padding.Top = 3.000000000000000000
+  Padding.Right = 3.000000000000000000
+  Padding.Bottom = 3.000000000000000000
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
@@ -11,8 +16,9 @@ object frmProduce: TfrmProduce
   DesignerMasterStyle = 0
   object lblStatus: TLabel
     Align = MostBottom
-    Position.Y = 160.000000000000000000
-    Size.Width = 600.000000000000000000
+    Position.X = 3.000000000000000000
+    Position.Y = 150.000000000000000000
+    Size.Width = 594.000000000000000000
     Size.Height = 17.000000000000000000
     Size.PlatformDefault = False
     Text = 'Idle'
@@ -20,19 +26,21 @@ object frmProduce: TfrmProduce
   object Layout1: TLayout
     Align = Top
     Margins.Bottom = 3.000000000000000000
-    Size.Width = 600.000000000000000000
+    Position.X = 3.000000000000000000
+    Position.Y = 3.000000000000000000
+    Size.Width = 594.000000000000000000
     Size.Height = 24.000000000000000000
     Size.PlatformDefault = False
     object Layout2: TLayout
       Align = Left
-      Size.Width = 135.000000000000000000
+      Size.Width = 105.000000000000000000
       Size.Height = 24.000000000000000000
       Size.PlatformDefault = False
       object Label2: TLabel
         Align = MostLeft
         AutoSize = True
         Margins.Right = 3.000000000000000000
-        Size.Width = 42.000000000000000000
+        Size.Width = 34.000000000000000000
         Size.Height = 24.000000000000000000
         Size.PlatformDefault = False
         TextSettings.HorzAlign = Trailing
@@ -42,14 +50,14 @@ object frmProduce: TfrmProduce
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         Align = Client
         Text = 'test'
-        Size.Width = 90.000000000000000000
+        Size.Width = 68.000000000000000000
         Size.Height = 24.000000000000000000
         Size.PlatformDefault = False
       end
     end
     object Layout4: TLayout
       Align = Client
-      Size.Width = 329.000000000000000000
+      Size.Width = 243.000000000000000000
       Size.Height = 24.000000000000000000
       Size.PlatformDefault = False
       object Label3: TLabel
@@ -66,7 +74,7 @@ object frmProduce: TfrmProduce
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         Align = Client
         Text = 'Test message '#248#230#229' - '#20320#22909
-        Size.Width = 269.000000000000000000
+        Size.Width = 183.000000000000000000
         Size.Height = 24.000000000000000000
         Size.PlatformDefault = False
       end
@@ -74,15 +82,15 @@ object frmProduce: TfrmProduce
     object Layout5: TLayout
       Align = Left
       Margins.Right = 10.000000000000000000
-      Position.X = 135.000000000000000000
-      Size.Width = 126.000000000000000000
+      Position.X = 105.000000000000000000
+      Size.Width = 101.000000000000000000
       Size.Height = 24.000000000000000000
       Size.PlatformDefault = False
       object Label4: TLabel
         Align = MostLeft
         AutoSize = True
         Margins.Right = 3.000000000000000000
-        Size.Width = 39.000000000000000000
+        Size.Width = 27.000000000000000000
         Size.Height = 24.000000000000000000
         Size.PlatformDefault = False
         TextSettings.HorzAlign = Trailing
@@ -92,7 +100,35 @@ object frmProduce: TfrmProduce
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         Align = Client
         Text = 'key'
-        Size.Width = 84.000000000000000000
+        Size.Width = 71.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+      end
+    end
+    object Layout6: TLayout
+      Align = Left
+      Position.X = 216.000000000000000000
+      Size.Width = 135.000000000000000000
+      Size.Height = 24.000000000000000000
+      Size.PlatformDefault = False
+      object Label1: TLabel
+        Align = MostLeft
+        AutoSize = True
+        Margins.Right = 3.000000000000000000
+        Size.Width = 54.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Trailing
+        Text = 'Partition'
+      end
+      object edtPartition: TSpinBox
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Client
+        Cursor = crIBeam
+        Min = -1.000000000000000000
+        Max = 99.000000000000000000
+        Value = -1.000000000000000000
+        Size.Width = 78.000000000000000000
         Size.Height = 24.000000000000000000
         Size.PlatformDefault = False
       end
@@ -102,8 +138,9 @@ object frmProduce: TfrmProduce
     Align = Bottom
     Margins.Top = 3.000000000000000000
     Margins.Bottom = 3.000000000000000000
-    Position.Y = 132.000000000000000000
-    Size.Width = 600.000000000000000000
+    Position.X = 3.000000000000000000
+    Position.Y = 122.000000000000000000
+    Size.Width = 594.000000000000000000
     Size.Height = 25.000000000000000000
     Size.PlatformDefault = False
     object edtMessageCount: TSpinBox
@@ -115,7 +152,7 @@ object frmProduce: TfrmProduce
       Value = 5.000000000000000000
       Position.X = 2.000000000000000000
       Margins.Left = 2.000000000000000000
-      Size.Width = 135.000000000000000000
+      Size.Width = 111.000000000000000000
       Size.Height = 25.000000000000000000
       Size.PlatformDefault = False
     end
@@ -123,7 +160,7 @@ object frmProduce: TfrmProduce
       Align = Client
       Margins.Left = 3.000000000000000000
       Margins.Right = 3.000000000000000000
-      Size.Width = 158.000000000000000000
+      Size.Width = 166.000000000000000000
       Size.Height = 25.000000000000000000
       Size.PlatformDefault = False
       Text = 'Produce'
@@ -132,8 +169,8 @@ object frmProduce: TfrmProduce
     object Button4: TButton
       Align = Right
       Margins.Left = 3.000000000000000000
-      Position.X = 304.000000000000000000
-      Size.Width = 156.000000000000000000
+      Position.X = 288.000000000000000000
+      Size.Width = 166.000000000000000000
       Size.Height = 25.000000000000000000
       Size.PlatformDefault = False
       Text = 'Flush'
@@ -143,7 +180,7 @@ object frmProduce: TfrmProduce
       Align = Right
       IsChecked = True
       Margins.Left = 3.000000000000000000
-      Position.X = 463.000000000000000000
+      Position.X = 457.000000000000000000
       Size.Width = 137.000000000000000000
       Size.Height = 25.000000000000000000
       Size.PlatformDefault = False
@@ -158,11 +195,11 @@ object frmProduce: TfrmProduce
     TextSettings.Font.Size = 14.000000000000000000
     OnChange = memConfigChange
     Align = Client
-    Size.Width = 600.000000000000000000
-    Size.Height = 102.000000000000000000
+    Size.Width = 594.000000000000000000
+    Size.Height = 89.000000000000000000
     Size.PlatformDefault = False
-    Viewport.Width = 600.000000000000000000
-    Viewport.Height = 102.000000000000000000
+    Viewport.Width = 590.000000000000000000
+    Viewport.Height = 85.000000000000000000
   end
   object tmrUpdate: TTimer
     Interval = 200

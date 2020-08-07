@@ -3,7 +3,7 @@ unit Kafka.Helper;
 interface
 
 uses
-  System.SysUtils, System.Classes,
+  System.SysUtils, System.Classes, System.Diagnostics, System.DateUtils,
 
   Kafka.Types,
   Kafka.Lib;
@@ -12,6 +12,32 @@ type
   EKafkaError = class(Exception);
 
   TOnLog = procedure(const Values: TStrings) of object;
+
+  TOperationTimer = record
+  private
+    FStopwatch: TStopwatch;
+    FOperation: String;
+  public
+    constructor Create(const Operation: String); overload;
+    constructor Create(const Operation: String; Args: Array of const); overload;
+
+    procedure Start(const Operation: String); overload;
+    procedure Start(const Operation: String; Args: Array of const); overload;
+
+    procedure Stop;
+
+    class operator Finalize(var ADest: TOperationTimer);
+  end;
+
+  TKafkaUtils = class
+  public
+    class function PointerToStr(const Value: Pointer; const Len: Integer; const Encoding: TEncoding): String; static;
+    class function PointerToBytes(const Value: Pointer; const Len: Integer): TBytes; static;
+    class function StrToBytes(const Value: String; const Encoding: TEncoding): TBytes; static;
+    class procedure StringsToConfigArrays(const Values: TStrings; out NameArr, ValueArr: TArray<String>); static;
+    class function StringsToIntegerArray(const Value: String): TArray<Integer>;
+    class function DateTimeToStrMS(const Value: TDateTime): String; static;
+  end;
 
   TKafkaHelper = class
   private
@@ -57,11 +83,7 @@ type
     class procedure Flush(const KafkaHandle: prd_kafka_t; const Timeout: Integer = 1000);
 
     // Utils
-    class function PointerToStr(const Value: Pointer; const Len: Integer; const Encoding: TEncoding): String; static;
-    class function PointerToBytes(const Value: Pointer; const Len: Integer): TBytes; static;
-    class function StrToBytes(const Value: String; const Encoding: TEncoding): TBytes; static;
     class function IsKafkaError(const Error: rd_kafka_resp_err_t): Boolean; static;
-    class procedure StringsToConfigArrays(const Values: TStrings; out NameArr, ValueArr: TArray<String>);
 
     // Internal
     class procedure FlushLogs;
@@ -105,6 +127,122 @@ begin
   TKafkaHelper.Log(format(StrErrorCallBackReaso, [String(reason)]), kltError);
 end;
 
+{ TOperationTimer }
+
+constructor TOperationTimer.Create(const Operation: String);
+begin
+  Start(Operation);
+end;
+
+constructor TOperationTimer.Create(const Operation: String; Args: Array of const);
+begin
+  Create(format(Operation, Args));
+end;
+
+procedure TOperationTimer.Start(const Operation: String);
+begin
+  Stop;
+
+  FOperation := Operation;
+
+  TKafkaHelper.Log('Started - ' + FOperation, TKafkaLogType.kltDebug);
+
+  FStopwatch.Start;
+end;
+
+procedure TOperationTimer.Start(const Operation: String; Args: Array of const);
+begin
+  Start(format(Operation, Args));
+end;
+
+procedure TOperationTimer.Stop;
+begin
+  if FStopwatch.IsRunning then
+  begin
+    FStopwatch.Stop;
+
+    TKafkaHelper.Log('Finished - ' + FOperation + ' in ' + FStopwatch.ElapsedMilliseconds.ToString + 'ms', TKafkaLogType.kltDebug);
+  end;
+end;
+
+class operator TOperationTimer.Finalize(var ADest: TOperationTimer);
+begin
+  if ADest.FStopwatch.IsRunning then
+  begin
+    ADest.FStopwatch.Stop;
+
+    TKafkaHelper.Log('Finished - ' + ADest.FOperation + ' in ' + ADest.FStopwatch.ElapsedMilliseconds.ToString + 'ms', TKafkaLogType.kltDebug);
+  end;
+end;
+
+{ TKafkaUtils }
+
+class procedure TKafkaUtils.StringsToConfigArrays(const Values: TStrings; out NameArr, ValueArr: TArray<String>);
+var
+  i: Integer;
+  KeyValue: TArray<String>;
+begin
+  for i := 0 to pred(Values.Count) do
+  begin
+    if pos('=', Values[i]) <> 0 then
+    begin
+      KeyValue := Values[i].Split(['='], 2);
+
+      NameArr := NameArr + [KeyValue[0]];
+      ValueArr := ValueArr + [KeyValue[1]];
+    end;
+  end;
+end;
+
+class function TKafkaUtils.StringsToIntegerArray(const Value: String): TArray<Integer>;
+var
+  StrArray: TArray<String>;
+  i: Integer;
+begin
+  StrArray := Value.Split([',']);
+
+  SetLength(Result, length(StrArray));
+
+  for i := Low(StrArray) to High(StrArray) do
+  begin
+    Result[i] := StrToInt(StrArray[i]);
+  end;
+end;
+
+class function TKafkaUtils.DateTimeToStrMS(const Value: TDateTime): String;
+begin
+  Result := DateTimeToStr(Value) + '.' + MilliSecondOf(Value).ToString.PadLeft(3, '0');
+end;
+
+class function TKafkaUtils.StrToBytes(const Value: String; const Encoding: TEncoding): TBytes;
+begin
+  if Value = '' then
+  begin
+    Result := [];
+  end
+  else
+  begin
+    Result := Encoding.GetBytes(Value);
+  end;
+end;
+
+class function TKafkaUtils.PointerToStr(const Value: Pointer; const Len: Integer; const Encoding: TEncoding): String;
+var
+  Data: TBytes;
+begin
+  SetLength(Data, Len);
+  Move(Value^, Pointer(Data)^, Len);
+
+  Result := Encoding.GetString(Data);
+end;
+
+class function TKafkaUtils.PointerToBytes(const Value: Pointer; const Len: Integer): TBytes;
+begin
+  SetLength(Result, Len);
+  Move(Value^, Pointer(Result)^, Len);
+end;
+
+
 { TKafkaHelper }
 
 class procedure TKafkaHelper.ConsumerClose(const KafkaHandle: prd_kafka_t);
@@ -139,6 +277,8 @@ end;
 
 class procedure TKafkaHelper.Flush(const KafkaHandle: prd_kafka_t; const Timeout: Integer);
 begin
+  TOperationTimer.Create('Flushing');
+
   rd_kafka_flush(KafkaHandle, Timeout);
 end;
 
@@ -332,20 +472,24 @@ var
   i: Integer;
   KeyData: TBytes;
 begin
+  {$IFDEF DEBUG}var Timer := TOperationTimer.Create('Formatting %d messages', [Length(Payloads)]);{$ENDIF}
+
   SetLength(PayloadPointers, length(Payloads));
   SetLength(PayloadLengths, length(Payloads));
 
   KeyData := TEncoding.UTF8.GetBytes(Key);
 
-  KeyBytes := StrToBytes(Key, Encoding);
+  KeyBytes := TKafkaUtils.StrToBytes(Key, Encoding);
 
   for i := Low(Payloads) to High(Payloads) do
   begin
-    PayloadBytes := StrToBytes(Payloads[i], Encoding);
+    PayloadBytes := TKafkaUtils.StrToBytes(Payloads[i], Encoding);
 
     PayloadPointers[i] := @PayloadBytes[0];
     PayloadLengths[i] := Length(PayloadBytes);
   end;
+
+  {$IFDEF DEBUG}Timer.Start('Producing %d messages', [Length(Payloads)]);{$ENDIF}
 
   Result := Produce(
     Topic,
@@ -363,8 +507,8 @@ class function TKafkaHelper.Produce(const Topic: prd_kafka_topic_t; const Payloa
 var
   KeyBytes, PayloadBytes: TBytes;
 begin
-  KeyBytes := StrToBytes(Key, TEncoding.UTF8);
-  PayloadBytes := StrToBytes(Payload, TEncoding.UTF8);
+  KeyBytes := TKafkaUtils.StrToBytes(Key, TEncoding.UTF8);
+  PayloadBytes := TKafkaUtils.StrToBytes(Payload, TEncoding.UTF8);
 
   Result := Produce(
     Topic,
@@ -454,61 +598,11 @@ begin
   end;
 end;
 
-class procedure TKafkaHelper.StringsToConfigArrays(const Values: TStrings; out NameArr, ValueArr: TArray<String>);
-var
-  i: Integer;
-  Name, Value: String;
-  KeyValue: TArray<String>;
-begin
-  for i := 0 to pred(Values.Count) do
-  begin
-    if pos('=', Values[i]) <> 0 then
-    begin
-      KeyValue := Values[i].Split(['='], 2);
-
-      NameArr := NameArr + [KeyValue[0]];
-      ValueArr := ValueArr + [KeyValue[1]];
-    end;
-  end;
-end;
-
-class function TKafkaHelper.StrToBytes(const Value: String; const Encoding: TEncoding): TBytes;
-begin
-  if Value = '' then
-  begin
-    Result := [];
-  end
-  else
-  begin
-    Result := Encoding.GetBytes(Value);
-  end;
-end;
-
-{ TKafkaHelper }
-
 class function TKafkaHelper.IsKafkaError(const Error: rd_kafka_resp_err_t): Boolean;
 begin
   Result :=
     (Error <> RD_KAFKA_RESP_ERR_NO_ERROR) and
     (Error <> RD_KAFKA_RESP_ERR__PARTITION_EOF);
-end;
-
-class function TKafkaHelper.PointerToStr(const Value: Pointer; const Len: Integer; const Encoding: TEncoding): String;
-var
-  Data: TBytes;
-begin
-  SetLength(Data, Len);
-  Move(Value^, Pointer(Data)^, Len);
-
-  Result := Encoding.GetString(Data);
-end;
-
-class function TKafkaHelper.PointerToBytes(const Value: Pointer; const Len: Integer): TBytes;
-var
-  Data: TBytes;
-begin
-  SetLength(Result, Len);
-  Move(Value^, Pointer(Result)^, Len);
 end;
 
 class function TKafkaHelper.Produce(const Topic: prd_kafka_topic_t; const Payloads: TArray<String>; const Key: String; const Partition: Int32;
