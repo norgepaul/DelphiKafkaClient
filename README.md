@@ -6,6 +6,9 @@
 
 DelphiKafkaClient is a cross platform Delphi client/wrapper for Apache [Kafka](https://github.com/edenhill/librdkafka). Windows (i386/x64) and Linux (x64) are supported. Tested on Delphi 10.4, but should work with all modern Delphi releases.
 
+## Disclaimer
+While it appears to work as expected, DelphiKafkaClient is a proof of concept and has never been tested in production.
+
 ## Installation
 You will need to install Apache Kafka - [https://kafka.apache.org/quickstart](https://kafka.apache.org/quickstart)
 
