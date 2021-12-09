@@ -3,7 +3,7 @@ unit Kafka.Classes;
 interface
 
 uses
-  System.SysUtils, System.Classes, System.Generics.Collections, System.Threading, System.SyncObjs,
+  System.SysUtils, System.Classes, System.Generics.Collections, System.SyncObjs,
 
   Kafka.Interfaces,
   Kafka.Types,
@@ -169,9 +169,8 @@ begin
       FPartitions[i]);
   end;
 
-  rd_kafka_assign(
-    FKafkaHandle,
-    TopicList);
+  // Using rd_kafka_subscribe instead of rd_kafka_assign allows for RegEx wildcards in topic names
+  rd_kafka_subscribe(FKafkaHandle, TopicList);
 end;
 
 { TKafkaConsumerThreadBase }
