@@ -147,7 +147,7 @@ end;
 
 procedure TKafkaConsumerThread.DoSetup;
 var
-  i: Integer;
+  i, p: Integer;
   TopicList: prd_kafka_topic_partition_list_t;
 begin
   FKafkaHandle := TKafkaHelper.NewConsumer(FConfiguration);
@@ -163,11 +163,15 @@ begin
 
   for i := Low(FTopics) to High(FTopics) do
   begin
-    rd_kafka_topic_partition_list_add(
-      TopicList,
-      PAnsiChar(AnsiString(FTopics[i])),
-      FPartitions[i]);
+    for p := 0 to Length(FPartitions) - 1 do
+      begin
+        rd_kafka_topic_partition_list_add(
+          TopicList,
+          PAnsiChar(AnsiString(FTopics[i])),
+          FPartitions[p]);
+      end;
   end;
+
 
   rd_kafka_assign(
     FKafkaHandle,
